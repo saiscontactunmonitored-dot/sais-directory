@@ -1045,8 +1045,31 @@
     function getAddress(b) { return getVal(b, ['Address', 'Full Address', 'Postal Address']); }
     function getDescription(b) { return getVal(b, ['Description', 'Services', 'About', 'Notes', 'Details']); }
 
-    // Using JSONP via dynamic script tag to bypass browser CORS redirection rules
+    // Fetch data using fetch API with follow redirect support, fallback to JSONP if needed
     function fetchDirectoryData() {
+      fetch(APPS_SCRIPT_URL, {
+        method: 'GET',
+        redirect: 'follow'
+      })
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(function(data) {
+        if (data && data.error) {
+          showError("Backend Error: " + data.error);
+        } else {
+          onDataLoaded(data);
+        }
+      })
+      .catch(function(err) {
+        loadViaJsonp();
+      });
+    }
+
+    function loadViaJsonp() {
       window.handleAppsScriptResponse = function(data) {
         if (data && data.error) {
           showError("Backend Error: " + data.error);
@@ -1058,7 +1081,7 @@
       var script = document.createElement('script');
       script.src = APPS_SCRIPT_URL + '?callback=handleAppsScriptResponse';
       script.onerror = function() {
-        showError("Failed to load script payload. Verify Google Apps Script Web App access is set to 'Anyone'.");
+        showError("Failed to load directory data. Please verify Google Apps Script deployment access.");
       };
       document.body.appendChild(script);
     }
@@ -1112,64 +1135,20 @@
       });
     }
 
-    function setupEventListeners() {
-      hamburgerBtn.addEventListener('click', toggleMenu);
-      menuOverlay.addEventListener('click', closeMenu);
-
-      searchInput.addEventListener('input', applyFilters);
-      categoryFilter.addEventListener('change', applyFilters);
-      locationFilter.addEventListener('change', applyFilters);
-
-      clearButton.addEventListener('click', function() {
-        searchInput.value = '';
-        categoryFilter.value = '';
-        locationFilter.value = '';
-        applyFilters();
-      });
-
-      prevBtn.addEventListener('click', function() {
-        if (currentPage > 1) {
-          currentPage--;
-          renderCurrentPage();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      });
-
-      nextBtn.addEventListener('click', function() {
-        var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
-        if (currentPage < totalPages) {
-          currentPage++;
-          renderCurrentPage();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      });
-
-      modalClose.addEventListener('click', closeModal);
-      businessModal.addEventListener('click', function(e) {
-        if (e.target === businessModal) closeModal();
-      });
-
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && businessModal.classList.contains('active')) {
-          closeModal();
-        }
-      });
-    }
-
-    function applyFilters() {
-      var query = searchInput.value.toLowerCase().trim();
-      var selCategory = categoryFilter.value;
-      var selLocation = locationFilter.value;
+    function filterBusinesses() {
+      var searchTerm = searchInput.value.toLowerCase().trim();
+      var selectedCat = categoryFilter.value.toLowerCase();
+      var selectedLoc = locationFilter.value.toLowerCase();
 
       filteredBusinesses = allBusinesses.filter(function(b) {
         var name = getName(b).toLowerCase();
-        var cat = getCategory(b);
-        var loc = getLocation(b);
+        var cat = getCategory(b).toLowerCase();
+        var loc = getLocation(b).toLowerCase();
         var desc = getDescription(b).toLowerCase();
 
-        var matchesSearch = !query || name.includes(query) || cat.toLowerCase().includes(query) || loc.toLowerCase().includes(query) || desc.includes(query);
-        var matchesCategory = !selCategory || cat === selCategory;
-        var matchesLocation = !selLocation || loc === selLocation;
+        var matchesSearch = !searchTerm || name.includes(searchTerm) || cat.includes(searchTerm) || loc.includes(searchTerm) || desc.includes(searchTerm);
+        var matchesCategory = !selectedCat || cat === selectedCat;
+        var matchesLocation = !selectedLoc || loc === selectedLoc;
 
         return matchesSearch && matchesCategory && matchesLocation;
       });
@@ -1197,41 +1176,75 @@
       var pageItems = filteredBusinesses.slice(startIdx, endIdx);
 
       pageItems.forEach(function(b) {
-        var card = createBusinessCard(b);
+        var card = document.createElement('div');
+        card.className = 'business-card';
+        card.onclick = function() { openModal(b); };
+
+        var cat = getCategory(b);
+        var name = getName(b);
+        var loc = getLocation(b);
+
+        card.innerHTML = 
+          '<div>' +
+            '<div class="card-category">' + escapeHtml(cat) + '</div>' +
+            '<div class="card-title">' + escapeHtml(name) + '</div>' +
+            '<div class="card-location">📍 ' + escapeHtml(loc) + '</div>' +
+          '</div>' +
+          '<div class="card-btn">View Details →</div>';
+
         directoryGrid.appendChild(card);
       });
 
       if (totalPages > 1) {
         pagination.style.display = 'flex';
         pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
-        prevBtn.disabled = (currentPage === 1);
-        nextBtn.disabled = (currentPage === totalPages);
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
       } else {
         pagination.style.display = 'none';
       }
     }
 
-    function createBusinessCard(b) {
-      var card = document.createElement('div');
-      card.className = 'business-card';
+    function setupEventListeners() {
+      hamburgerBtn.addEventListener('click', toggleMenu);
+      menuOverlay.addEventListener('click', closeMenu);
 
-      var name = getName(b);
-      var category = getCategory(b);
-      var location = getLocation(b);
+      searchInput.addEventListener('input', filterBusinesses);
+      categoryFilter.addEventListener('change', filterBusinesses);
+      locationFilter.addEventListener('change', filterBusinesses);
 
-      card.innerHTML = 
-        '<div>' +
-          '<div class="card-category">' + escapeHtml(category) + '</div>' +
-          '<div class="card-title">' + escapeHtml(name) + '</div>' +
-          '<div class="card-location">📍 ' + escapeHtml(location) + '</div>' +
-        '</div>' +
-        '<button class="card-btn" type="button">View Details</button>';
-
-      card.addEventListener('click', function() {
-        openModal(b);
+      clearButton.addEventListener('click', function() {
+        searchInput.value = '';
+        categoryFilter.value = '';
+        locationFilter.value = '';
+        filterBusinesses();
       });
 
-      return card;
+      prevBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+          currentPage--;
+          renderCurrentPage();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+
+      nextBtn.addEventListener('click', function() {
+        var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderCurrentPage();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+
+      modalClose.addEventListener('click', closeModal);
+      businessModal.addEventListener('click', function(e) {
+        if (e.target === businessModal) closeModal();
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+      });
     }
 
     function openModal(b) {
@@ -1239,41 +1252,39 @@
       document.getElementById('modalBusinessName').textContent = getName(b);
       document.getElementById('modalLocation').textContent = '📍 ' + getLocation(b);
 
-      var modalDetails = document.getElementById('modalDetails');
-      modalDetails.innerHTML = '';
+      var detailsContainer = document.getElementById('modalDetails');
+      detailsContainer.innerHTML = '';
 
       var phone = getPhone(b);
       var email = getEmail(b);
       var website = getWebsite(b);
       var address = getAddress(b);
-      var description = getDescription(b);
-
-      if (description) {
-        modalDetails.appendChild(createDetailItem('About Services', escapeHtml(description)));
-      }
+      var desc = getDescription(b);
 
       if (phone) {
-        var phoneHtml = '<a class="phone-link" href="tel:' + escapeHtml(phone.replace(/\s+/g, '')) + '">📞 ' + escapeHtml(phone) + '</a>';
-        modalDetails.appendChild(createDetailItem('Phone Number', phoneHtml, true));
+        var cleanPhone = phone.replace(/[^\d+]/g, '');
+        detailsContainer.appendChild(createDetailItem('Phone Number', '<a class="phone-link" href="tel:' + cleanPhone + '">📞 ' + escapeHtml(phone) + '</a>'));
       }
 
       if (email) {
-        var emailHtml = '<a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + '</a>';
-        modalDetails.appendChild(createDetailItem('Email', emailHtml, true));
+        detailsContainer.appendChild(createDetailItem('Email', '<a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + '</a>'));
       }
 
       if (website) {
-        var url = website.startsWith('http') ? website : 'https://' + website;
-        var webHtml = '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(website) + ' ↗</a>';
-        modalDetails.appendChild(createDetailItem('Website', webHtml, true));
+        var formattedWeb = website.startsWith('http') ? website : 'https://' + website;
+        detailsContainer.appendChild(createDetailItem('Website', '<a href="' + escapeHtml(formattedWeb) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(website) + ' ↗</a>'));
       }
 
       if (address) {
-        modalDetails.appendChild(createDetailItem('Address', escapeHtml(address)));
+        detailsContainer.appendChild(createDetailItem('Address', escapeHtml(address)));
       }
 
-      if (!description && !phone && !email && !website && !address) {
-        modalDetails.innerHTML = '<p class="text-muted-fallback">No additional details listed for this business.</p>';
+      if (desc) {
+        detailsContainer.appendChild(createDetailItem('About / Services', escapeHtml(desc)));
+      }
+
+      if (!phone && !email && !website && !address && !desc) {
+        detailsContainer.innerHTML = '<div class="text-muted-fallback">No further contact details provided for this business.</div>';
       }
 
       businessModal.classList.add('active');
@@ -1287,15 +1298,10 @@
       document.body.style.overflow = '';
     }
 
-    function createDetailItem(label, content, isHtml) {
+    function createDetailItem(label, htmlContent) {
       var item = document.createElement('div');
       item.className = 'detail-item';
-      var labelEl = '<strong>' + escapeHtml(label) + '</strong>';
-      if (isHtml) {
-        item.innerHTML = labelEl + content;
-      } else {
-        item.innerHTML = labelEl + content;
-      }
+      item.innerHTML = '<strong>' + label + '</strong><div>' + htmlContent + '</div>';
       return item;
     }
 
