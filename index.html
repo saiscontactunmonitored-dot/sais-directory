@@ -715,32 +715,6 @@
       border-color: var(--neutral-900);
     }
 
-    .social-links-container {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-
-    .social-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      background-color: var(--neutral-100);
-      color: var(--neutral-900) !important;
-      border-radius: var(--radius-sm);
-      font-size: 0.82rem;
-      text-decoration: none !important;
-      font-weight: 600;
-      border: 1px solid var(--neutral-200);
-      transition: all 0.15s ease;
-    }
-
-    .social-badge:hover {
-      background-color: var(--neutral-900);
-      color: #ffffff !important;
-      border-color: var(--neutral-900);
-    }
-
     .text-muted-fallback {
       color: var(--neutral-500);
       font-style: italic;
@@ -1071,23 +1045,22 @@
     function getAddress(b) { return getVal(b, ['Address', 'Full Address', 'Postal Address']); }
     function getDescription(b) { return getVal(b, ['Description', 'Services', 'About', 'Notes', 'Details']); }
 
+    // Using JSONP via dynamic script tag to bypass browser CORS redirection rules
     function fetchDirectoryData() {
-      fetch(APPS_SCRIPT_URL, {
-        method: "GET",
-        redirect: "follow"
-      })
-      .then(function(response) {
-        if (!response.ok) {
-          throw new Error('HTTP error status: ' + response.status);
+      window.handleAppsScriptResponse = function(data) {
+        if (data && data.error) {
+          showError("Backend Error: " + data.error);
+        } else {
+          onDataLoaded(data);
         }
-        return response.json();
-      })
-      .then(function(data) {
-        onDataLoaded(data);
-      })
-      .catch(function(err) {
-        showError("Failed to retrieve directory data: " + (err.message || err));
-      });
+      };
+
+      var script = document.createElement('script');
+      script.src = APPS_SCRIPT_URL + '?callback=handleAppsScriptResponse';
+      script.onerror = function() {
+        showError("Failed to load script payload. Verify Google Apps Script Web App access is set to 'Anyone'.");
+      };
+      document.body.appendChild(script);
     }
 
     function onDataLoaded(data) {
