@@ -1,0 +1,21 @@
+{
+  "name": "Somerset Animal Business Directory",
+  "short_name": "Somerset Pets",
+  "description": "Connecting pet owners with trusted local animal businesses across Somerset.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#c82333",
+  "icons": [
+    {
+      "src": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlgAboLIY31LyxC5Llo6f1lgk5tSJOuoTQRee9X2MKW0PJ6o2EAbkIJNKO2IYL1F2P_TZk7fnhl1T2loLml7812rH_4TkCs52dmCZ2Klmp9---yyuhnCL0pyfc-X4bin-Neyr6Lo7JzjRyG=s500",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlgAboLIY31LyxC5Llo6f1lgk5tSJOuoTQRee9X2MKW0PJ6o2EAbkIJNKO2IYL1F2P_TZk7fnhl1T2loLml7812rH_4TkCs52dmCZ2Klmp9---yyuhnCL0pyfc-X4bin-Neyr6Lo7JzjRyG=s500",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
