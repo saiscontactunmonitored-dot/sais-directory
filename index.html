@@ -24,6 +24,7 @@
   <meta property="og:image" content="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmsqy3NdKFejdGvX5SihzkpeIu5GpbicpE6xv0gUcFz_aWB9UIuwkufgzLT0rIfOtoUllmnq0qKhShLl3VtwH6P6pKjHB-LOXaP5irMxQXGYvGJitq0jbhvbmRA9HY0okv7lYdoUrEAfQCf=s1200">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="fb:app_id" content="966242223397117">
 
   <!-- Twitter / X -->
   <meta property="twitter:card" content="summary_large_image">
@@ -31,6 +32,40 @@
   <meta property="twitter:title" content="Somerset Animal Business Directory 🐾">
   <meta property="twitter:description" content="Connecting pet owners with trusted local animal businesses and services across Somerset. Discover vets, groomers, dog walkers, trainers, pet sitters, boarding, therapy, pet shops and more — all in one place.">
   <meta property="twitter:image" content="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmsqy3NdKFejdGvX5SihzkpeIu5GpbicpE6xv0gUcFz_aWB9UIuwkufgzLT0rIfOtoUllmnq0qKhShLl3VtwH6P6pKjHB-LOXaP5irMxQXGYvGJitq0jbhvbmRA9HY0okv7lYdoUrEAfQCf=s1200">
+
+  <!-- Structured Data / JSON-LD Schema for Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemPage",
+    "name": "Somerset Animal Business Directory",
+    "description": "Connecting pet owners with trusted local animal businesses and services across Somerset.",
+    "url": "https://directory.somersetanimalinformationservices.com/",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Somerset Animal Information Services",
+      "url": "https://www.somersetanimalinformationservices.com/"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Animal Care Services and Local Businesses in Somerset"
+    },
+    "spatialCoverage": {
+      "@type": "Place",
+      "name": "Somerset, United Kingdom"
+    }
+  }
+  </script>
+
+  <!-- Google Analytics (GA4) Tag -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-W819GZY4CZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-W819GZY4CZ');
+  </script>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1031,110 +1066,53 @@
       menuOverlay.classList.remove('is-active');
     }
 
-    function getVal(b, keys) {
-      if (!b) return '';
-      for (var i = 0; i < keys.length; i++) {
-        var key = keys[i];
-        for (var prop in b) {
-          if (prop.toLowerCase().trim() === key.toLowerCase().trim() && b[prop]) {
-            return String(b[prop]).trim();
-          }
-        }
-      }
-      return '';
-    }
-
-    function getName(b) { return getVal(b, ['Business Name', 'Name', 'Business', 'Company']) || 'Business Name'; }
-    function getCategory(b) { return getVal(b, ['Category', 'Category Name', 'Service Category', 'Services Offered', 'Type']) || 'Animal Service'; }
-    function getLocation(b) { return getVal(b, ['Area / Town', 'Location', 'Town', 'Area', 'City']) || 'Somerset'; }
-    function getWebsite(b) { return getVal(b, ['Website', 'Web', 'URL', 'Link', 'Site']); }
-    function getPhone(b) { return getVal(b, ['Phone', 'Telephone', 'Contact Number', 'Mobile', 'Tel']); }
-    function getEmail(b) { return getVal(b, ['Email', 'Email Address', 'Contact Email']); }
-    function getAddress(b) { return getVal(b, ['Address', 'Full Address', 'Postal Address']); }
-    function getDescription(b) { return getVal(b, ['Description', 'Services', 'About', 'Notes', 'Details']); }
-
     function fetchDirectoryData() {
-      fetch(APPS_SCRIPT_URL, {
-        method: 'GET',
-        redirect: 'follow'
-      })
-      .then(function(response) {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(function(data) {
-        if (data && data.error) {
-          showError("Backend Error: " + data.error);
-        } else {
-          onDataLoaded(data);
-        }
-      })
-      .catch(function(err) {
-        loadViaJsonp();
+      fetch(APPS_SCRIPT_URL)
+        .then(function(response) {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(function(data) {
+          if (Array.isArray(data)) {
+            allBusinesses = data;
+          } else if (data && data.data && Array.isArray(data.data)) {
+            allBusinesses = data.data;
+          } else {
+            allBusinesses = [];
+          }
+
+          populateFilters(allBusinesses);
+          applyFilters();
+          showDirectory();
+        })
+        .catch(function(err) {
+          console.error('Error loading directory:', err);
+          showError('Failed to load listings. Please check your internet connection and try again.');
+        });
+    }
+
+    function populateFilters(data) {
+      var categories = new Set();
+      var locations = new Set();
+
+      data.forEach(function(item) {
+        if (item.category) categories.add(item.category.trim());
+        if (item.location) locations.add(item.location.trim());
       });
-    }
 
-    function loadViaJsonp() {
-      window.handleAppsScriptResponse = function(data) {
-        if (data && data.error) {
-          showError("Backend Error: " + data.error);
-        } else {
-          onDataLoaded(data);
-        }
-      };
+      var sortedCategories = Array.from(categories).sort();
+      var sortedLocations = Array.from(locations).sort();
 
-      var script = document.createElement('script');
-      script.src = APPS_SCRIPT_URL + '?callback=handleAppsScriptResponse';
-      script.onerror = function() {
-        showError("Failed to load directory data. Please verify Google Apps Script deployment access.");
-      };
-      document.body.appendChild(script);
-    }
-
-    function onDataLoaded(data) {
-      if (!data || !data.businesses || data.businesses.length === 0) {
-        showError("No directory records were found in the Google Sheet.");
-        return;
-      }
-
-      allBusinesses = data.businesses;
-      loadingState.style.display = 'none';
-      filteredBusinesses = allBusinesses;
-      populateFilterOptions();
-      currentPage = 1;
-      renderCurrentPage();
-    }
-
-    function showError(msg) {
-      loadingState.style.display = 'none';
-      errorMessage.innerText = msg;
-      errorState.style.display = 'block';
-    }
-
-    function populateFilterOptions() {
       categoryFilter.innerHTML = '<option value="">All Categories</option>';
-      locationFilter.innerHTML = '<option value="">All Locations</option>';
-
-      var categories = {};
-      var locations = {};
-
-      allBusinesses.forEach(function(b) {
-        var cat = getCategory(b);
-        var loc = getLocation(b);
-        if (cat && cat !== 'Animal Service') categories[cat] = true;
-        if (loc && loc !== 'Somerset') locations[loc] = true;
-      });
-
-      Object.keys(categories).sort().forEach(function(cat) {
+      sortedCategories.forEach(function(cat) {
         var opt = document.createElement('option');
         opt.value = cat;
         opt.textContent = cat;
         categoryFilter.appendChild(opt);
       });
 
-      Object.keys(locations).sort().forEach(function(loc) {
+      locationFilter.innerHTML = '<option value="">All Locations</option>';
+      sortedLocations.forEach(function(loc) {
         var opt = document.createElement('option');
         opt.value = loc;
         opt.textContent = loc;
@@ -1142,96 +1120,38 @@
       });
     }
 
-    function filterBusinesses() {
-      var searchTerm = searchInput.value.toLowerCase().trim();
-      var selectedCat = categoryFilter.value.toLowerCase();
-      var selectedLoc = locationFilter.value.toLowerCase();
-
-      filteredBusinesses = allBusinesses.filter(function(b) {
-        var name = getName(b).toLowerCase();
-        var cat = getCategory(b).toLowerCase();
-        var loc = getLocation(b).toLowerCase();
-        var desc = getDescription(b).toLowerCase();
-
-        var matchesSearch = !searchTerm || name.includes(searchTerm) || cat.includes(searchTerm) || loc.includes(searchTerm) || desc.includes(searchTerm);
-        var matchesCategory = !selectedCat || cat === selectedCat;
-        var matchesLocation = !selectedLoc || loc === selectedLoc;
-
-        return matchesSearch && matchesCategory && matchesLocation;
-      });
-
-      currentPage = 1;
-      renderCurrentPage();
-    }
-
-    function renderCurrentPage() {
-      directoryGrid.innerHTML = '';
-
-      if (filteredBusinesses.length === 0) {
-        directoryGrid.style.display = 'none';
-        pagination.style.display = 'none';
-        emptyState.style.display = 'block';
-        return;
-      }
-
-      emptyState.style.display = 'none';
-      directoryGrid.style.display = 'grid';
-
-      var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
-      var startIdx = (currentPage - 1) * pageSize;
-      var endIdx = startIdx + pageSize;
-      var pageItems = filteredBusinesses.slice(startIdx, endIdx);
-
-      pageItems.forEach(function(b) {
-        var card = document.createElement('div');
-        card.className = 'business-card';
-        card.onclick = function() { openModal(b); };
-
-        var cat = getCategory(b);
-        var name = getName(b);
-        var loc = getLocation(b);
-
-        card.innerHTML = 
-          '<div>' +
-            '<div class="card-category">' + escapeHtml(cat) + '</div>' +
-            '<div class="card-title">' + escapeHtml(name) + '</div>' +
-            '<div class="card-location">📍 ' + escapeHtml(loc) + '</div>' +
-          '</div>' +
-          '<div class="card-btn">View Details →</div>';
-
-        directoryGrid.appendChild(card);
-      });
-
-      if (totalPages > 1) {
-        pagination.style.display = 'flex';
-        pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages;
-      } else {
-        pagination.style.display = 'none';
-      }
-    }
-
     function setupEventListeners() {
       hamburgerBtn.addEventListener('click', toggleMenu);
       menuOverlay.addEventListener('click', closeMenu);
 
-      searchInput.addEventListener('input', filterBusinesses);
-      categoryFilter.addEventListener('change', filterBusinesses);
-      locationFilter.addEventListener('change', filterBusinesses);
+      searchInput.addEventListener('input', function() {
+        currentPage = 1;
+        applyFilters();
+      });
+
+      categoryFilter.addEventListener('change', function() {
+        currentPage = 1;
+        applyFilters();
+      });
+
+      locationFilter.addEventListener('change', function() {
+        currentPage = 1;
+        applyFilters();
+      });
 
       clearButton.addEventListener('click', function() {
         searchInput.value = '';
         categoryFilter.value = '';
         locationFilter.value = '';
-        filterBusinesses();
+        currentPage = 1;
+        applyFilters();
       });
 
       prevBtn.addEventListener('click', function() {
         if (currentPage > 1) {
           currentPage--;
-          renderCurrentPage();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          renderGrid();
+          window.scrollTo({ top: directoryGrid.offsetTop - 100, behavior: 'smooth' });
         }
       });
 
@@ -1239,8 +1159,8 @@
         var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
         if (currentPage < totalPages) {
           currentPage++;
-          renderCurrentPage();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          renderGrid();
+          window.scrollTo({ top: directoryGrid.offsetTop - 100, behavior: 'smooth' });
         }
       });
 
@@ -1250,48 +1170,124 @@
       });
 
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeModal();
+        if (e.key === 'Escape' && businessModal.classList.contains('active')) {
+          closeModal();
+        }
       });
     }
 
-    function openModal(b) {
-      document.getElementById('modalCategory').textContent = getCategory(b);
-      document.getElementById('modalBusinessName').textContent = getName(b);
-      document.getElementById('modalLocation').textContent = '📍 ' + getLocation(b);
+    function applyFilters() {
+      var query = searchInput.value.toLowerCase().trim();
+      var selectedCategory = categoryFilter.value;
+      var selectedLocation = locationFilter.value;
+
+      filteredBusinesses = allBusinesses.filter(function(item) {
+        var matchesSearch = !query || 
+          (item.name && item.name.toLowerCase().includes(query)) ||
+          (item.category && item.category.toLowerCase().includes(query)) ||
+          (item.location && item.location.toLowerCase().includes(query)) ||
+          (item.description && item.description.toLowerCase().includes(query));
+
+        var matchesCategory = !selectedCategory || item.category === selectedCategory;
+        var matchesLocation = !selectedLocation || item.location === selectedLocation;
+
+        return matchesSearch && matchesCategory && matchesLocation;
+      });
+
+      renderGrid();
+    }
+
+    function renderGrid() {
+      directoryGrid.innerHTML = '';
+
+      if (filteredBusinesses.length === 0) {
+        showEmpty();
+        return;
+      }
+
+      showDirectory();
+
+      var totalPages = Math.ceil(filteredBusinesses.length / pageSize) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      var startIndex = (currentPage - 1) * pageSize;
+      var endIndex = Math.min(startIndex + pageSize, filteredBusinesses.length);
+      var currentItems = filteredBusinesses.slice(startIndex, endIndex);
+
+      currentItems.forEach(function(item) {
+        var card = document.createElement('div');
+        card.className = 'business-card';
+        
+        var categoryText = item.category || 'Animal Service';
+        var locationText = item.location ? '📍 ' + item.location : 'Somerset';
+
+        card.innerHTML = 
+          '<div>' +
+            '<div class="card-category">' + escapeHtml(categoryText) + '</div>' +
+            '<h3 class="card-title">' + escapeHtml(item.name || 'Unnamed Business') + '</h3>' +
+            '<div class="card-location">' + escapeHtml(locationText) + '</div>' +
+          '</div>' +
+          '<button class="card-btn" type="button">View Details</button>';
+
+        card.addEventListener('click', function() {
+          openModal(item);
+        });
+
+        directoryGrid.appendChild(card);
+      });
+
+      if (filteredBusinesses.length > pageSize) {
+        pagination.style.display = 'flex';
+        pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
+        prevBtn.disabled = (currentPage === 1);
+        nextBtn.disabled = (currentPage === totalPages);
+      } else {
+        pagination.style.display = 'none';
+      }
+    }
+
+    function openModal(item) {
+      document.getElementById('modalCategory').textContent = item.category || 'Animal Service';
+      document.getElementById('modalBusinessName').textContent = item.name || 'Unnamed Business';
+      document.getElementById('modalLocation').textContent = item.location ? '📍 ' + item.location : 'Somerset';
 
       var detailsContainer = document.getElementById('modalDetails');
       detailsContainer.innerHTML = '';
 
-      var phone = getPhone(b);
-      var email = getEmail(b);
-      var website = getWebsite(b);
-      var address = getAddress(b);
-      var desc = getDescription(b);
-
-      if (phone) {
-        var cleanPhone = phone.replace(/[^\d+]/g, '');
-        detailsContainer.appendChild(createDetailItem('Phone Number', '<a class="phone-link" href="tel:' + cleanPhone + '">📞 ' + escapeHtml(phone) + '</a>'));
+      if (item.description) {
+        detailsContainer.appendChild(createDetailItem('About', item.description));
       }
 
-      if (email) {
-        detailsContainer.appendChild(createDetailItem('Email', '<a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + '</a>'));
+      if (item.phone) {
+        var phoneDiv = document.createElement('div');
+        phoneDiv.className = 'detail-item';
+        phoneDiv.innerHTML = '<strong>Phone / Contact</strong>' +
+          '<a class="phone-link" href="tel:' + escapeHtml(item.phone) + '">📞 ' + escapeHtml(item.phone) + '</a>';
+        detailsContainer.appendChild(phoneDiv);
       }
 
-      if (website) {
-        var formattedWeb = website.startsWith('http') ? website : 'https://' + website;
-        detailsContainer.appendChild(createDetailItem('Website', '<a href="' + escapeHtml(formattedWeb) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(website) + ' ↗</a>'));
+      if (item.website) {
+        var url = item.website;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
+        var webDiv = document.createElement('div');
+        webDiv.className = 'detail-item';
+        webDiv.innerHTML = '<strong>Website</strong>' +
+          '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">' + escapeHtml(item.website) + ' ↗</a>';
+        detailsContainer.appendChild(webDiv);
       }
 
-      if (address) {
-        detailsContainer.appendChild(createDetailItem('Address', escapeHtml(address)));
+      if (item.email) {
+        var emailDiv = document.createElement('div');
+        emailDiv.className = 'detail-item';
+        emailDiv.innerHTML = '<strong>Email</strong>' +
+          '<a href="mailto:' + escapeHtml(item.email) + '">' + escapeHtml(item.email) + '</a>';
+        detailsContainer.appendChild(emailDiv);
       }
 
-      if (desc) {
-        detailsContainer.appendChild(createDetailItem('About / Services', escapeHtml(desc)));
-      }
-
-      if (!phone && !email && !website && !address && !desc) {
-        detailsContainer.innerHTML = '<div class="text-muted-fallback">No further contact details provided for this business.</div>';
+      if (item.address) {
+        detailsContainer.appendChild(createDetailItem('Address', item.address));
       }
 
       businessModal.classList.add('active');
@@ -1305,11 +1301,35 @@
       document.body.style.overflow = '';
     }
 
-    function createDetailItem(label, htmlContent) {
-      var item = document.createElement('div');
-      item.className = 'detail-item';
-      item.innerHTML = '<strong>' + label + '</strong><div>' + htmlContent + '</div>';
-      return item;
+    function createDetailItem(label, text) {
+      var div = document.createElement('div');
+      div.className = 'detail-item';
+      div.innerHTML = '<strong>' + escapeHtml(label) + '</strong><div>' + escapeHtml(text) + '</div>';
+      return div;
+    }
+
+    function showDirectory() {
+      loadingState.style.display = 'none';
+      errorState.style.display = 'none';
+      emptyState.style.display = 'none';
+      directoryGrid.style.display = 'grid';
+    }
+
+    function showEmpty() {
+      loadingState.style.display = 'none';
+      errorState.style.display = 'none';
+      directoryGrid.style.display = 'none';
+      pagination.style.display = 'none';
+      emptyState.style.display = 'block';
+    }
+
+    function showError(msg) {
+      loadingState.style.display = 'none';
+      directoryGrid.style.display = 'none';
+      emptyState.style.display = 'none';
+      pagination.style.display = 'none';
+      errorMessage.textContent = msg || 'Please refresh or try again shortly.';
+      errorState.style.display = 'block';
     }
 
     function escapeHtml(str) {
