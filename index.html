@@ -1016,6 +1016,7 @@
   <script>
     var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfploEZODQA34z--473LFz1WbHsUfNEPUS6l4f9R9gpljLW3Mc6iz2ywdryrK-IPdh/exec';
 
+    var rawBusinesses = [];
     var allBusinesses = [];
     var filteredBusinesses = [];
     var currentPage = 1;
@@ -1068,23 +1069,39 @@
           return response.json();
         })
         .then(function(data) {
-          console.log("Raw fetched data:", data); // Check console if needed
+          console.log("Raw fetched data:", data);
 
           if (Array.isArray(data)) {
-            allBusinesses = data;
+            rawBusinesses = data;
           } else if (data && data.data && Array.isArray(data.data)) {
-            allBusinesses = data.data;
+            rawBusinesses = data.data;
           } else if (data && typeof data === 'object') {
-            // Handle case where object keys might contain the array
             var keys = Object.keys(data);
             if (keys.length > 0 && Array.isArray(data[keys[0]])) {
-              allBusinesses = data[keys[0]];
+              rawBusinesses = data[keys[0]];
             } else {
-              allBusinesses = [];
+              rawBusinesses = [];
             }
           } else {
-            allBusinesses = [];
+            rawBusinesses = [];
           }
+
+          // Normalize keys to support any sheet header variations automatically
+          allBusinesses = rawBusinesses.map(function(item) {
+            return {
+              name: findValue(item, ['name', 'business name', 'business', 'company', 'title']),
+              category: findValue(item, ['category', 'service', 'type', 'business type']),
+              location: findValue(item, ['location', 'town', 'city', 'area', 'address town']),
+              description: findValue(item, ['description', 'details', 'about', 'summary']),
+              phone: findValue(item, ['phone', 'telephone', 'mobile', 'contact number']),
+              email: findValue(item, ['email', 'contact email', 'mail']),
+              website: findValue(item, ['website', 'web', 'url', 'link']),
+              address: findValue(item, ['address', 'street address', 'full address'])
+            };
+          }).filter(function(item) {
+            // Filter out empty rows where name is completely missing
+            return item.name !== '';
+          });
 
           loadingState.style.display = 'none';
 
@@ -1105,13 +1122,30 @@
         });
     }
 
+    // Helper to safely extract property values regardless of casing or spacing in keys
+    function findValue(obj, possibleKeys) {
+      if (!obj || typeof obj !== 'object') return '';
+      var objKeys = Object.keys(obj);
+      for (var i = 0; i < possibleKeys.length; i++) {
+        var target = possibleKeys[i].toLowerCase();
+        for (var j = 0; j < objKeys.length; j++) {
+          var currentKey = objKeys[j];
+          if (currentKey.toLowerCase().trim() === target) {
+            var val = obj[currentKey];
+            return val !== null && val !== undefined ? String(val).trim() : '';
+          }
+        }
+      }
+      return '';
+    }
+
     function populateDropdowns() {
       var categories = new Set();
       var locations = new Set();
 
       allBusinesses.forEach(function(item) {
-        if (item.category) categories.add(item.category.trim());
-        if (item.location) locations.add(item.location.trim());
+        if (item.category) categories.add(item.category);
+        if (item.location) locations.add(item.location);
       });
 
       Array.from(categories).sort().forEach(function(cat) {
@@ -1190,13 +1224,13 @@
 
       filteredBusinesses = allBusinesses.filter(function(item) {
         var matchesSearch = !query || 
-          (item.name && item.name.toLowerCase().includes(query)) ||
-          (item.category && item.category.toLowerCase().includes(query)) ||
-          (item.location && item.location.toLowerCase().includes(query)) ||
-          (item.description && item.description.toLowerCase().includes(query));
+          item.name.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query) ||
+          item.location.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query);
 
-        var matchesCategory = !selectedCategory || (item.category && item.category.trim() === selectedCategory);
-        var matchesLocation = !selectedLocation || (item.location && item.location.trim() === selectedLocation);
+        var matchesCategory = !selectedCategory || item.category === selectedCategory;
+        var matchesLocation = !selectedLocation || item.location === selectedLocation;
 
         return matchesSearch && matchesCategory && matchesLocation;
       });
