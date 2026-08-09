@@ -204,7 +204,7 @@
       position: relative;
       width: 100%;
       background: linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.65)), 
-                  url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
+                url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
       padding: 60px 16px;
       margin-bottom: 32px;
       box-shadow: var(--shadow-md);
@@ -360,7 +360,7 @@
     .advertise-card {
       position: relative;
       background: linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.72)), 
-                  url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
+                url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: var(--radius-lg);
       padding: 24px;
@@ -1020,7 +1020,7 @@
     });
 
     function toggleMenu() {
-      var isActive = hamburgerBtn.classList.toggle('is-active');
+      hamburgerBtn.classList.toggle('is-active');
       headerLinks.classList.toggle('is-active');
       menuOverlay.classList.toggle('is-active');
     }
@@ -1054,87 +1054,50 @@
     function getDescription(b) { return getVal(b, ['Description', 'Services', 'About', 'Notes', 'Details']); }
 
     function fetchDirectoryData() {
-      fetch(APPS_SCRIPT_URL, {
-        method: 'GET',
-        redirect: 'follow'
-      })
-      .then(function(response) {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(function(data) {
-        if (data && data.error) {
-          showError("Backend Error: " + data.error);
-        } else {
-          onDataLoaded(data);
-        }
-      })
-      .catch(function(err) {
-        loadViaJsonp();
-      });
+      fetch(APPS_SCRIPT_URL)
+        .then(function(response) {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(function(data) {
+          allBusinesses = Array.isArray(data) ? data : (data.businesses || data.data || []);
+          loadingState.style.display = 'none';
+          
+          if (allBusinesses.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+          }
+
+          populateDropdowns();
+          filterAndRender();
+        })
+        .catch(function(err) {
+          console.error('Fetch error:', err);
+          loadingState.style.display = 'none';
+          errorState.style.display = 'block';
+          errorMessage.textContent = 'Could not load listings from the registry. Please check your connection.';
+        });
     }
 
-    function loadViaJsonp() {
-      window.handleAppsScriptResponse = function(data) {
-        if (data && data.error) {
-          showError("Backend Error: " + data.error);
-        } else {
-          onDataLoaded(data);
-        }
-      };
-
-      var script = document.createElement('script');
-      script.src = APPS_SCRIPT_URL + '?callback=handleAppsScriptResponse';
-      script.onerror = function() {
-        showError("Failed to load directory data. Please verify Google Apps Script deployment access.");
-      };
-      document.body.appendChild(script);
-    }
-
-    function onDataLoaded(data) {
-      if (!data || !data.businesses || data.businesses.length === 0) {
-        showError("No directory records were found in the Google Sheet.");
-        return;
-      }
-
-      allBusinesses = data.businesses;
-      loadingState.style.display = 'none';
-      filteredBusinesses = allBusinesses;
-      populateFilterOptions();
-      currentPage = 1;
-      renderCurrentPage();
-    }
-
-    function showError(msg) {
-      loadingState.style.display = 'none';
-      errorMessage.innerText = msg;
-      errorState.style.display = 'block';
-    }
-
-    function populateFilterOptions() {
-      categoryFilter.innerHTML = '<option value="">All Categories</option>';
-      locationFilter.innerHTML = '<option value="">All Locations</option>';
-
-      var categories = {};
-      var locations = {};
+    function populateDropdowns() {
+      var categories = new Set();
+      var locations = new Set();
 
       allBusinesses.forEach(function(b) {
         var cat = getCategory(b);
         var loc = getLocation(b);
-        if (cat && cat !== 'Animal Service') categories[cat] = true;
-        if (loc && loc !== 'Somerset') locations[loc] = true;
+        if (cat) categories.add(cat);
+        if (loc) locations.add(loc);
       });
 
-      Object.keys(categories).sort().forEach(function(cat) {
+      Array.from(categories).sort().forEach(function(cat) {
         var opt = document.createElement('option');
         opt.value = cat;
         opt.textContent = cat;
         categoryFilter.appendChild(opt);
       });
 
-      Object.keys(locations).sort().forEach(function(loc) {
+      Array.from(locations).sort().forEach(function(loc) {
         var opt = document.createElement('option');
         opt.value = loc;
         opt.textContent = loc;
@@ -1142,105 +1105,47 @@
       });
     }
 
-    function filterBusinesses() {
-      var searchTerm = searchInput.value.toLowerCase().trim();
-      var selectedCat = categoryFilter.value.toLowerCase();
-      var selectedLoc = locationFilter.value.toLowerCase();
-
-      filteredBusinesses = allBusinesses.filter(function(b) {
-        var name = getName(b).toLowerCase();
-        var cat = getCategory(b).toLowerCase();
-        var loc = getLocation(b).toLowerCase();
-        var desc = getDescription(b).toLowerCase();
-
-        var matchesSearch = !searchTerm || name.includes(searchTerm) || cat.includes(searchTerm) || loc.includes(searchTerm) || desc.includes(searchTerm);
-        var matchesCategory = !selectedCat || cat === selectedCat;
-        var matchesLocation = !selectedLoc || loc === selectedLoc;
-
-        return matchesSearch && matchesCategory && matchesLocation;
-      });
-
-      currentPage = 1;
-      renderCurrentPage();
-    }
-
-    function renderCurrentPage() {
-      directoryGrid.innerHTML = '';
-
-      if (filteredBusinesses.length === 0) {
-        directoryGrid.style.display = 'none';
-        pagination.style.display = 'none';
-        emptyState.style.display = 'block';
-        return;
-      }
-
-      emptyState.style.display = 'none';
-      directoryGrid.style.display = 'grid';
-
-      var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
-      var startIdx = (currentPage - 1) * pageSize;
-      var endIdx = startIdx + pageSize;
-      var pageItems = filteredBusinesses.slice(startIdx, endIdx);
-
-      pageItems.forEach(function(b) {
-        var card = document.createElement('div');
-        card.className = 'business-card';
-        card.onclick = function() { openModal(b); };
-
-        var cat = getCategory(b);
-        var name = getName(b);
-        var loc = getLocation(b);
-
-        card.innerHTML = 
-          '<div>' +
-            '<div class="card-category">' + escapeHtml(cat) + '</div>' +
-            '<div class="card-title">' + escapeHtml(name) + '</div>' +
-            '<div class="card-location">📍 ' + escapeHtml(loc) + '</div>' +
-          '</div>' +
-          '<div class="card-btn">View Details →</div>';
-
-        directoryGrid.appendChild(card);
-      });
-
-      if (totalPages > 1) {
-        pagination.style.display = 'flex';
-        pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages;
-      } else {
-        pagination.style.display = 'none';
-      }
-    }
-
     function setupEventListeners() {
       hamburgerBtn.addEventListener('click', toggleMenu);
       menuOverlay.addEventListener('click', closeMenu);
 
-      searchInput.addEventListener('input', filterBusinesses);
-      categoryFilter.addEventListener('change', filterBusinesses);
-      locationFilter.addEventListener('change', filterBusinesses);
+      searchInput.addEventListener('input', function() {
+        currentPage = 1;
+        filterAndRender();
+      });
+
+      categoryFilter.addEventListener('change', function() {
+        currentPage = 1;
+        filterAndRender();
+      });
+
+      locationFilter.addEventListener('change', function() {
+        currentPage = 1;
+        filterAndRender();
+      });
 
       clearButton.addEventListener('click', function() {
         searchInput.value = '';
         categoryFilter.value = '';
         locationFilter.value = '';
-        filterBusinesses();
+        currentPage = 1;
+        filterAndRender();
       });
 
       prevBtn.addEventListener('click', function() {
         if (currentPage > 1) {
           currentPage--;
-          renderCurrentPage();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          renderGrid();
+          window.scrollTo({ top: directoryGrid.offsetTop - 120, behavior: 'smooth' });
         }
       });
 
       nextBtn.addEventListener('click', function() {
-        var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
-        if (currentPage < totalPages) {
+        var maxPage = Math.ceil(filteredBusinesses.length / pageSize);
+        if (currentPage < maxPage) {
           currentPage++;
-          renderCurrentPage();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          renderGrid();
+          window.scrollTo({ top: directoryGrid.offsetTop - 120, behavior: 'smooth' });
         }
       });
 
@@ -1254,6 +1159,90 @@
       });
     }
 
+    function filterAndRender() {
+      var query = searchInput.value.toLowerCase().trim();
+      var selectedCat = categoryFilter.value;
+      var selectedLoc = locationFilter.value;
+
+      filteredBusinesses = allBusinesses.filter(function(b) {
+        var name = getName(b).toLowerCase();
+        var cat = getCategory(b);
+        var loc = getLocation(b);
+        var desc = getDescription(b).toLowerCase();
+
+        var matchesSearch = !query || name.indexOf(query) !== -1 || desc.indexOf(query) !== -1 || loc.toLowerCase().indexOf(query) !== -1 || cat.toLowerCase().indexOf(query) !== -1;
+        var matchesCat = !selectedCat || cat === selectedCat;
+        var matchesLoc = !selectedLoc || loc === selectedLoc;
+
+        return matchesSearch && matchesCat && matchesLoc;
+      });
+
+      currentPage = 1;
+      renderGrid();
+    }
+
+    function renderGrid() {
+      directoryGrid.innerHTML = '';
+
+      if (filteredBusinesses.length === 0) {
+        directoryGrid.style.display = 'none';
+        pagination.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      directoryGrid.style.display = 'grid';
+
+      var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
+      if (currentPage > totalPages) currentPage = totalPages || 1;
+
+      var start = (currentPage - 1) * pageSize;
+      var end = start + pageSize;
+      var pageItems = filteredBusinesses.slice(start, end);
+
+      pageItems.forEach(function(b) {
+        var card = document.createElement('div');
+        card.className = 'business-card';
+
+        var catDiv = document.createElement('div');
+        catDiv.className = 'card-category';
+        catDiv.textContent = getCategory(b);
+
+        var titleDiv = document.createElement('div');
+        titleDiv.className = 'card-title';
+        titleDiv.textContent = getName(b);
+
+        var locDiv = document.createElement('div');
+        locDiv.className = 'card-location';
+        locDiv.textContent = '📍 ' + getLocation(b);
+
+        var btnDiv = document.createElement('div');
+        btnDiv.className = 'card-btn';
+        btnDiv.textContent = 'View Details';
+
+        card.appendChild(catDiv);
+        card.appendChild(titleDiv);
+        card.appendChild(locDiv);
+        card.appendChild(btnDiv);
+
+        card.addEventListener('click', function() {
+          openModal(b);
+        });
+
+        directoryGrid.appendChild(card);
+      });
+
+      if (totalPages > 1) {
+        pagination.style.display = 'flex';
+        pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
+        prevBtn.disabled = (currentPage === 1);
+        nextBtn.disabled = (currentPage === totalPages);
+      } else {
+        pagination.style.display = 'none';
+      }
+    }
+
     function openModal(b) {
       document.getElementById('modalCategory').textContent = getCategory(b);
       document.getElementById('modalBusinessName').textContent = getName(b);
@@ -1262,58 +1251,63 @@
       var detailsContainer = document.getElementById('modalDetails');
       detailsContainer.innerHTML = '';
 
-      var phone = getPhone(b);
-      var email = getEmail(b);
-      var website = getWebsite(b);
-      var address = getAddress(b);
       var desc = getDescription(b);
-
-      if (phone) {
-        var cleanPhone = phone.replace(/[^\d+]/g, '');
-        detailsContainer.appendChild(createDetailItem('Phone Number', '<a class="phone-link" href="tel:' + cleanPhone + '">📞 ' + escapeHtml(phone) + '</a>'));
-      }
-
-      if (email) {
-        detailsContainer.appendChild(createDetailItem('Email', '<a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + '</a>'));
-      }
-
-      if (website) {
-        var formattedWeb = website.startsWith('http') ? website : 'https://' + website;
-        detailsContainer.appendChild(createDetailItem('Website', '<a href="' + escapeHtml(formattedWeb) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(website) + ' ↗</a>'));
-      }
-
-      if (address) {
-        detailsContainer.appendChild(createDetailItem('Address', escapeHtml(address)));
-      }
-
       if (desc) {
-        detailsContainer.appendChild(createDetailItem('About / Services', escapeHtml(desc)));
+        var item = document.createElement('div');
+        item.className = 'detail-item';
+        item.innerHTML = '<strong>About / Services</strong>' + escapeHtml(desc);
+        detailsContainer.appendChild(item);
       }
 
-      if (!phone && !email && !website && !address && !desc) {
-        detailsContainer.innerHTML = '<div class="text-muted-fallback">No further contact details provided for this business.</div>';
+      var address = getAddress(b);
+      if (address) {
+        var item = document.createElement('div');
+        item.className = 'detail-item';
+        item.innerHTML = '<strong>Address</strong>' + escapeHtml(address);
+        detailsContainer.appendChild(item);
+      }
+
+      var phone = getPhone(b);
+      if (phone) {
+        var item = document.createElement('div');
+        item.className = 'detail-item';
+        item.innerHTML = '<strong>Telephone</strong><a class="phone-link" href="tel:' + escapeHtml(phone) + '">📞 ' + escapeHtml(phone) + '</a>';
+        detailsContainer.appendChild(item);
+      }
+
+      var email = getEmail(b);
+      if (email) {
+        var item = document.createElement('div');
+        item.className = 'detail-item';
+        item.innerHTML = '<strong>Email Address</strong><a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + '</a>';
+        detailsContainer.appendChild(item);
+      }
+
+      var website = getWebsite(b);
+      if (website) {
+        var item = document.createElement('div');
+        item.className = 'detail-item';
+        item.innerHTML = '<strong>Website</strong><a href="' + escapeHtml(website) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(website) + ' ↗</a>';
+        detailsContainer.appendChild(item);
+      }
+
+      if (!desc && !address && !phone && !email && !website) {
+        var item = document.createElement('div');
+        item.className = 'detail-item text-muted-fallback';
+        item.textContent = 'No extra contact details provided for this listing.';
+        detailsContainer.appendChild(item);
       }
 
       businessModal.classList.add('active');
-      businessModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
       businessModal.classList.remove('active');
-      businessModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
     }
 
-    function createDetailItem(label, htmlContent) {
-      var item = document.createElement('div');
-      item.className = 'detail-item';
-      item.innerHTML = '<strong>' + label + '</strong><div>' + htmlContent + '</div>';
-      return item;
-    }
-
     function escapeHtml(str) {
-      if (!str) return '';
       return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
