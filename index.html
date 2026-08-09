@@ -14,6 +14,9 @@
 
   <!-- PWA Manifest -->
   <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SAIS Directory">
 
   <!-- Favicon (Round Logo Link - High-Res) -->
   <link rel="icon" type="image/jpeg" href="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlgAboLIY31LyxC5Llo6f1lgk5tSJOuoTQRee9X2MKW0PJ6o2EAbkIJNKO2IYL1F2P_TZk7fnhl1T2loLml7812rH_4TkCs52dmCZ2Klmp9---yyuhnCL0pyfc-X4bin-Neyr6Lo7JzjRyG=s500">
@@ -742,6 +745,192 @@
       border-top: 1px solid var(--neutral-200);
     }
 
+    /* PWA INSTALL BANNER / POPUP */
+    .pwa-install-banner {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      width: calc(100% - 32px);
+      max-width: 480px;
+      background: #ffffff;
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 18px 20px;
+      z-index: 1099;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .pwa-install-banner.is-visible {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .pwa-banner-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pwa-banner-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid var(--neutral-200);
+    }
+
+    .pwa-banner-text h4 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--neutral-900);
+      margin-bottom: 2px;
+    }
+
+    .pwa-banner-text p {
+      font-size: 0.82rem;
+      color: var(--neutral-500);
+      line-height: 1.4;
+    }
+
+    .pwa-banner-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pwa-install-btn {
+      flex: 1;
+      background-color: var(--brand-red);
+      color: #ffffff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      text-align: center;
+    }
+
+    .pwa-install-btn:hover {
+      background-color: var(--brand-red-hover);
+    }
+
+    .pwa-dismiss-btn {
+      background-color: var(--neutral-100);
+      color: var(--neutral-700);
+      border: 1px solid var(--neutral-200);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pwa-dismiss-btn:hover {
+      background-color: var(--neutral-200);
+    }
+
+    /* iOS INSTRUCTIONS MODAL */
+    .ios-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      z-index: 1100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      padding: 0;
+    }
+
+    @media (min-width: 640px) {
+      .ios-modal {
+        align-items: center;
+        padding: 16px;
+      }
+    }
+
+    .ios-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .ios-modal-content {
+      background: #ffffff;
+      width: 100%;
+      max-width: 480px;
+      border-top-left-radius: var(--radius-lg);
+      border-top-right-radius: var(--radius-lg);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @media (min-width: 640px) {
+      .ios-modal-content {
+        border-radius: var(--radius-lg);
+        animation: none;
+      }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .ios-modal h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--neutral-900);
+      margin-bottom: 8px;
+    }
+
+    .ios-modal p {
+      font-size: 0.9rem;
+      color: var(--neutral-700);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .ios-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .ios-step-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--neutral-900);
+      background: var(--neutral-100);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--neutral-200);
+    }
+
+    .ios-step-icon {
+      font-size: 1.2rem;
+    }
+
     /* FOOTER */
     footer {
       background-color: #ffffff;
@@ -969,6 +1158,45 @@
     </div>
   </div>
 
+  <!-- PWA INSTALL PROMPT POPUP -->
+  <div id="pwaInstallBanner" class="pwa-install-banner">
+    <div class="pwa-banner-header">
+      <img class="pwa-banner-icon" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlgAboLIY31LyxC5Llo6f1lgk5tSJOuoTQRee9X2MKW0PJ6o2EAbkIJNKO2IYL1F2P_TZk7fnhl1T2loLml7812rH_4TkCs52dmCZ2Klmp9---yyuhnCL0pyfc-X4bin-Neyr6Lo7JzjRyG=s500" alt="App Logo">
+      <div class="pwa-banner-text">
+        <h4>Add to Home Screen</h4>
+        <p>Did you know you can now add us to your home page for quick, app-like access?</p>
+      </div>
+    </div>
+    <div class="pwa-banner-actions">
+      <button id="pwaInstallBtn" class="pwa-install-btn" type="button">Add to Home Screen</button>
+      <button id="pwaDismissBtn" class="pwa-dismiss-btn" type="button">Not Now</button>
+    </div>
+  </div>
+
+  <!-- iOS INSTRUCTIONAL MODAL -->
+  <div id="iosModal" class="ios-modal" aria-hidden="true">
+    <div class="ios-modal-content">
+      <button id="iosModalClose" class="modal-close" type="button" aria-label="Close instructions">✕</button>
+      <h3>Add to iPhone / iPad</h3>
+      <p>To add this directory to your home screen, follow these quick steps in Safari:</p>
+      <div class="ios-steps">
+        <div class="ios-step-item">
+          <span class="ios-step-icon">📤</span>
+          <span>1. Tap the <strong>Share</strong> button at the bottom of Safari.</span>
+        </div>
+        <div class="ios-step-item">
+          <span class="ios-step-icon">➕</span>
+          <span>2. Scroll down and tap <strong>"Add to Home Screen"</strong>.</span>
+        </div>
+        <div class="ios-step-item">
+          <span class="ios-step-icon">✅</span>
+          <span>3. Tap <strong>Add</strong> in the top right corner.</span>
+        </div>
+      </div>
+      <button id="iosGotItBtn" class="pwa-install-btn" type="button" style="width: 100%;">Got It</button>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-container">
       <div class="footer-top">
@@ -1017,9 +1245,19 @@
     var headerLinks = document.getElementById('headerLinks');
     var menuOverlay = document.getElementById('menuOverlay');
 
+    // PWA Prompt Elements
+    var deferredPrompt = null;
+    var pwaInstallBanner = document.getElementById('pwaInstallBanner');
+    var pwaInstallBtn = document.getElementById('pwaInstallBtn');
+    var pwaDismissBtn = document.getElementById('pwaDismissBtn');
+    var iosModal = document.getElementById('iosModal');
+    var iosModalClose = document.getElementById('iosModalClose');
+    var iosGotItBtn = document.getElementById('iosGotItBtn');
+
     document.addEventListener('DOMContentLoaded', function() {
       fetchDirectoryData();
       setupEventListeners();
+      setupPWAInstaller();
     });
 
     function toggleMenu() {
@@ -1032,6 +1270,74 @@
       hamburgerBtn.classList.remove('is-active');
       headerLinks.classList.remove('is-active');
       menuOverlay.classList.remove('is-active');
+    }
+
+    // PWA Install Logic
+    function setupPWAInstaller() {
+      // Check if already running as installed PWA or dismissed recently
+      var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      var dismissedTime = localStorage.getItem('sais_pwa_dismissed');
+      var now = new Date().getTime();
+
+      if (isStandalone || (dismissedTime && (now - dismissedTime < 86400000 * 7))) {
+        return; // Don't show if installed or dismissed within last 7 days
+      }
+
+      // Capture Android / Chrome beforeinstallprompt
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        // Show banner after a slight delay
+        setTimeout(function() {
+          pwaInstallBanner.classList.add('is-visible');
+        }, 2000);
+      });
+
+      // For iOS / Safari or browsers not triggering beforeinstallprompt automatically
+      var isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (!deferredPrompt) {
+        setTimeout(function() {
+          // Only show if not standalone
+          if (!isStandalone) {
+            pwaInstallBanner.classList.add('is-visible');
+          }
+        }, 3000);
+      }
+
+      pwaInstallBtn.addEventListener('click', async function() {
+        pwaInstallBanner.classList.remove('is-visible');
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          var choiceResult = await deferredPrompt.userChoice;
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          }
+          deferredPrompt = null;
+        } else if (isIosDevice || /Macintosh/.test(navigator.userAgent)) {
+          iosModal.classList.add('active');
+          iosModal.setAttribute('aria-hidden', 'false');
+        } else {
+          // Fallback alert / instruction if prompt isn't ready
+          alert('To add this app, open your browser menu (three dots or share icon) and select "Add to Home screen".');
+        }
+      });
+
+      pwaDismissBtn.addEventListener('click', function() {
+        pwaInstallBanner.classList.remove('is-visible');
+        localStorage.setItem('sais_pwa_dismissed', new Date().getTime());
+      });
+
+      iosModalClose.addEventListener('click', closeIosModal);
+      iosGotItBtn.addEventListener('click', closeIosModal);
+      iosModal.addEventListener('click', function(e) {
+        if (e.target === iosModal) closeIosModal();
+      });
+    }
+
+    function closeIosModal() {
+      iosModal.classList.remove('active');
+      iosModal.setAttribute('aria-hidden', 'true');
+      localStorage.setItem('sais_pwa_dismissed', new Date().getTime());
     }
 
     function getVal(b, keys) {
