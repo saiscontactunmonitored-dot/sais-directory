@@ -85,7 +85,7 @@
     .hero-banner-wrapper {
       position: relative;
       width: 100%;
-      background: linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.65)), 
+      background: linear-gradient(rgba(200, 35, 51, 0.75), rgba(15, 23, 42, 0.85)), 
                   url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
       padding: 60px 16px;
       margin-bottom: 32px;
@@ -240,7 +240,7 @@
             return {
               name: findValue(item, ['name', 'business name', 'business', 'company', 'title']),
               category: findValue(item, ['category', 'service', 'type', 'business type']),
-              location: findValue(item, ['location', 'town', 'city', 'area', 'address town']),
+              location: findValue(item, ['location', 'town', 'city', 'area', 'address town', 'borough', 'region']),
               description: findValue(item, ['description', 'details', 'about', 'summary']),
               phone: findValue(item, ['phone', 'telephone', 'mobile', 'contact number']),
               email: findValue(item, ['email', 'contact email', 'mail']),
@@ -294,6 +294,10 @@
     }
 
     function populateDropdowns(items) {
+      // Clear existing options except default first
+      categoryFilter.innerHTML = '<option value="">All Categories</option>';
+      locationFilter.innerHTML = '<option value="">All Locations</option>';
+
       var cats = new Set();
       var locs = new Set();
       items.forEach(function(i) {
@@ -301,10 +305,11 @@
         if (i.location) locs.add(i.location);
       });
 
-      cats.forEach(function(c) {
+      // Sort alphabetically for clean display
+      Array.from(cats).sort().forEach(function(c) {
         var opt = document.createElement('option'); opt.value = c; opt.textContent = c; categoryFilter.appendChild(opt);
       });
-      locs.forEach(function(l) {
+      Array.from(locs).sort().forEach(function(l) {
         var opt = document.createElement('option'); opt.value = l; opt.textContent = l; locationFilter.appendChild(opt);
       });
     }
