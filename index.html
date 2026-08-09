@@ -1053,30 +1053,60 @@
     function getAddress(b) { return getVal(b, ['Address', 'Full Address', 'Postal Address']); }
     function getDescription(b) { return getVal(b, ['Description', 'Services', 'About', 'Notes', 'Details']); }
 
-    function fetchDirectoryData() {
-      fetch(APPS_SCRIPT_URL)
-        .then(function(response) {
-          if (!response.ok) throw new Error('Network response was not ok');
-          return response.json();
-        })
-        .then(function(data) {
-          allBusinesses = Array.isArray(data) ? data : (data.businesses || data.data || []);
-          loadingState.style.display = 'none';
-          
-          if (allBusinesses.length === 0) {
-            emptyState.style.display = 'block';
-            return;
-          }
+    async function fetchDirectoryData() {
+      const cacheKey = "somerset_directory_data";
+      const cacheTimeKey = "somerset_directory_time";
+      const cacheDuration = 30 * 60 * 1000; // 30 minutes cache
 
-          populateDropdowns();
-          filterAndRender();
-        })
-        .catch(function(err) {
-          console.error('Fetch error:', err);
-          loadingState.style.display = 'none';
-          errorState.style.display = 'block';
-          errorMessage.textContent = 'Could not load listings from the registry. Please check your connection.';
-        });
+      const cachedData = localStorage.getItem(cacheKey);
+      const cachedTime = localStorage.getItem(cacheTimeKey);
+      const now = new Date().getTime();
+
+      if (cachedData && cachedTime && (now - cachedTime < cacheDuration)) {
+        try {
+          const data = JSON.parse(cachedData);
+          processLoadedData(data);
+          return;
+        } catch (e) {
+          console.warn("Cache parse failed, fetching fresh data...");
+        }
+      }
+
+      try {
+        const response = await fetch(APPS_SCRIPT_URL);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        localStorage.setItem(cacheTimeKey, now);
+
+        processLoadedData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        if (cachedData) {
+          try {
+            const data = JSON.parse(cachedData);
+            processLoadedData(data);
+            return;
+          } catch (e) {}
+        }
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+        errorMessage.textContent = 'Could not load directory data. Please check your connection or try again later.';
+      }
+    }
+
+    function processLoadedData(data) {
+      allBusinesses = Array.isArray(data) ? data : (data.businesses || data.data || []);
+      loadingState.style.display = 'none';
+
+      if (allBusinesses.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      populateDropdowns();
+      filterData();
     }
 
     function populateDropdowns() {
@@ -1090,14 +1120,17 @@
         if (loc) locations.add(loc);
       });
 
-      Array.from(categories).sort().forEach(function(cat) {
+      var sortedCats = Array.from(categories).sort();
+      var sortedLocs = Array.from(locations).sort();
+
+      sortedCats.forEach(function(cat) {
         var opt = document.createElement('option');
         opt.value = cat;
         opt.textContent = cat;
         categoryFilter.appendChild(opt);
       });
 
-      Array.from(locations).sort().forEach(function(loc) {
+      sortedLocs.forEach(function(loc) {
         var opt = document.createElement('option');
         opt.value = loc;
         opt.textContent = loc;
@@ -1105,61 +1138,7 @@
       });
     }
 
-    function setupEventListeners() {
-      hamburgerBtn.addEventListener('click', toggleMenu);
-      menuOverlay.addEventListener('click', closeMenu);
-
-      searchInput.addEventListener('input', function() {
-        currentPage = 1;
-        filterAndRender();
-      });
-
-      categoryFilter.addEventListener('change', function() {
-        currentPage = 1;
-        filterAndRender();
-      });
-
-      locationFilter.addEventListener('change', function() {
-        currentPage = 1;
-        filterAndRender();
-      });
-
-      clearButton.addEventListener('click', function() {
-        searchInput.value = '';
-        categoryFilter.value = '';
-        locationFilter.value = '';
-        currentPage = 1;
-        filterAndRender();
-      });
-
-      prevBtn.addEventListener('click', function() {
-        if (currentPage > 1) {
-          currentPage--;
-          renderGrid();
-          window.scrollTo({ top: directoryGrid.offsetTop - 120, behavior: 'smooth' });
-        }
-      });
-
-      nextBtn.addEventListener('click', function() {
-        var maxPage = Math.ceil(filteredBusinesses.length / pageSize);
-        if (currentPage < maxPage) {
-          currentPage++;
-          renderGrid();
-          window.scrollTo({ top: directoryGrid.offsetTop - 120, behavior: 'smooth' });
-        }
-      });
-
-      modalClose.addEventListener('click', closeModal);
-      businessModal.addEventListener('click', function(e) {
-        if (e.target === businessModal) closeModal();
-      });
-
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeModal();
-      });
-    }
-
-    function filterAndRender() {
+    function filterData() {
       var query = searchInput.value.toLowerCase().trim();
       var selectedCat = categoryFilter.value;
       var selectedLoc = locationFilter.value;
@@ -1169,8 +1148,9 @@
         var cat = getCategory(b);
         var loc = getLocation(b);
         var desc = getDescription(b).toLowerCase();
+        var address = getAddress(b).toLowerCase();
 
-        var matchesSearch = !query || name.indexOf(query) !== -1 || desc.indexOf(query) !== -1 || loc.toLowerCase().indexOf(query) !== -1 || cat.toLowerCase().indexOf(query) !== -1;
+        var matchesSearch = !query || name.includes(query) || desc.includes(query) || loc.toLowerCase().includes(query) || address.includes(query) || cat.toLowerCase().includes(query);
         var matchesCat = !selectedCat || cat === selectedCat;
         var matchesLoc = !selectedLoc || loc === selectedLoc;
 
@@ -1194,8 +1174,8 @@
       emptyState.style.display = 'none';
       directoryGrid.style.display = 'grid';
 
-      var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
-      if (currentPage > totalPages) currentPage = totalPages || 1;
+      var totalPages = Math.ceil(filteredBusinesses.length / pageSize) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
 
       var start = (currentPage - 1) * pageSize;
       var end = start + pageSize;
@@ -1205,26 +1185,18 @@
         var card = document.createElement('div');
         card.className = 'business-card';
 
-        var catDiv = document.createElement('div');
-        catDiv.className = 'card-category';
-        catDiv.textContent = getCategory(b);
+        var cat = getCategory(b);
+        var name = getName(b);
+        var loc = getLocation(b);
 
-        var titleDiv = document.createElement('div');
-        titleDiv.className = 'card-title';
-        titleDiv.textContent = getName(b);
-
-        var locDiv = document.createElement('div');
-        locDiv.className = 'card-location';
-        locDiv.textContent = '📍 ' + getLocation(b);
-
-        var btnDiv = document.createElement('div');
-        btnDiv.className = 'card-btn';
-        btnDiv.textContent = 'View Details';
-
-        card.appendChild(catDiv);
-        card.appendChild(titleDiv);
-        card.appendChild(locDiv);
-        card.appendChild(btnDiv);
+        card.innerHTML = `
+          <div>
+            <div class="card-category">${escapeHtml(cat)}</div>
+            <div class="card-title">${escapeHtml(name)}</div>
+            <div class="card-location">📍 ${escapeHtml(loc)}</div>
+          </div>
+          <div class="card-btn">View Details</div>
+        `;
 
         card.addEventListener('click', function() {
           openModal(b);
@@ -1233,11 +1205,11 @@
         directoryGrid.appendChild(card);
       });
 
-      if (totalPages > 1) {
+      if (filteredBusinesses.length > pageSize) {
         pagination.style.display = 'flex';
         pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
-        prevBtn.disabled = (currentPage === 1);
-        nextBtn.disabled = (currentPage === totalPages);
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
       } else {
         pagination.style.display = 'none';
       }
@@ -1253,67 +1225,130 @@
 
       var desc = getDescription(b);
       if (desc) {
-        var item = document.createElement('div');
-        item.className = 'detail-item';
-        item.innerHTML = '<strong>About / Services</strong>' + escapeHtml(desc);
-        detailsContainer.appendChild(item);
+        detailsContainer.innerHTML += `
+          <div class="detail-item">
+            <strong>About / Services</strong>
+            <p>${escapeHtml(desc)}</p>
+          </div>
+        `;
       }
 
       var address = getAddress(b);
       if (address) {
-        var item = document.createElement('div');
-        item.className = 'detail-item';
-        item.innerHTML = '<strong>Address</strong>' + escapeHtml(address);
-        detailsContainer.appendChild(item);
+        detailsContainer.innerHTML += `
+          <div class="detail-item">
+            <strong>Address</strong>
+            <p>${escapeHtml(address)}</p>
+          </div>
+        `;
       }
 
       var phone = getPhone(b);
       if (phone) {
-        var item = document.createElement('div');
-        item.className = 'detail-item';
-        item.innerHTML = '<strong>Telephone</strong><a class="phone-link" href="tel:' + escapeHtml(phone) + '">📞 ' + escapeHtml(phone) + '</a>';
-        detailsContainer.appendChild(item);
+        detailsContainer.innerHTML += `
+          <div class="detail-item">
+            <strong>Phone Number</strong>
+            <a class="phone-link" href="tel:${escapeHtml(phone)}">📞 ${escapeHtml(phone)}</a>
+          </div>
+        `;
       }
 
       var email = getEmail(b);
       if (email) {
-        var item = document.createElement('div');
-        item.className = 'detail-item';
-        item.innerHTML = '<strong>Email Address</strong><a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + '</a>';
-        detailsContainer.appendChild(item);
+        detailsContainer.innerHTML += `
+          <div class="detail-item">
+            <strong>Email Address</strong>
+            <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a>
+          </div>
+        `;
       }
 
       var website = getWebsite(b);
       if (website) {
-        var item = document.createElement('div');
-        item.className = 'detail-item';
-        item.innerHTML = '<strong>Website</strong><a href="' + escapeHtml(website) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(website) + ' ↗</a>';
-        detailsContainer.appendChild(item);
-      }
-
-      if (!desc && !address && !phone && !email && !website) {
-        var item = document.createElement('div');
-        item.className = 'detail-item text-muted-fallback';
-        item.textContent = 'No extra contact details provided for this listing.';
-        detailsContainer.appendChild(item);
+        var formattedUrl = website.startsWith('http') ? website : 'https://' + website;
+        detailsContainer.innerHTML += `
+          <div class="detail-item">
+            <strong>Website</strong>
+            <a href="${escapeHtml(formattedUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(website)} ↗</a>
+          </div>
+        `;
       }
 
       businessModal.classList.add('active');
+      businessModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
       businessModal.classList.remove('active');
+      businessModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
     }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+    function escapeHtml(text) {
+      var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    function setupEventListeners() {
+      hamburgerBtn.addEventListener('click', toggleMenu);
+      menuOverlay.addEventListener('click', closeMenu);
+
+      searchInput.addEventListener('input', function() {
+        filterData();
+      });
+
+      categoryFilter.addEventListener('change', function() {
+        filterData();
+      });
+
+      locationFilter.addEventListener('change', function() {
+        filterData();
+      });
+
+      clearButton.addEventListener('click', function() {
+        searchInput.value = '';
+        categoryFilter.value = '';
+        locationFilter.value = '';
+        filterData();
+      });
+
+      prevBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+          currentPage--;
+          renderGrid();
+          window.scrollTo({ top: 400, behavior: 'smooth' });
+        }
+      });
+
+      nextBtn.addEventListener('click', function() {
+        var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderGrid();
+          window.scrollTo({ top: 400, behavior: 'smooth' });
+        }
+      });
+
+      modalClose.addEventListener('click', closeModal);
+      businessModal.addEventListener('click', function(e) {
+        if (e.target === businessModal) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeModal();
+          closeMenu();
+        }
+      });
     }
   </script>
 </body>
