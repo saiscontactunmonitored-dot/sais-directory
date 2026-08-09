@@ -12,6 +12,9 @@
   <meta name="robots" content="index, follow">
   <meta name="language" content="English">
 
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json">
+
   <!-- Favicon (Round Logo Link - High-Res) -->
   <link rel="icon" type="image/jpeg" href="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlgAboLIY31LyxC5Llo6f1lgk5tSJOuoTQRee9X2MKW0PJ6o2EAbkIJNKO2IYL1F2P_TZk7fnhl1T2loLml7812rH_4TkCs52dmCZ2Klmp9---yyuhnCL0pyfc-X4bin-Neyr6Lo7JzjRyG=s500">
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlgAboLIY31LyxC5Llo6f1lgk5tSJOuoTQRee9X2MKW0PJ6o2EAbkIJNKO2IYL1F2P_TZk7fnhl1T2loLml7812rH_4TkCs52dmCZ2Klmp9---yyuhnCL0pyfc-X4bin-Neyr6Lo7JzjRyG=s500">
@@ -204,7 +207,7 @@
       position: relative;
       width: 100%;
       background: linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.65)), 
-                url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
+              url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
       padding: 60px 16px;
       margin-bottom: 32px;
       box-shadow: var(--shadow-md);
@@ -360,7 +363,7 @@
     .advertise-card {
       position: relative;
       background: linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.72)), 
-                url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
+              url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: var(--radius-lg);
       padding: 24px;
@@ -1054,57 +1057,63 @@
     function getDescription(b) { return getVal(b, ['Description', 'Services', 'About', 'Notes', 'Details']); }
 
     async function fetchDirectoryData() {
-      const cacheKey = "somerset_directory_data";
-      const cacheTimeKey = "somerset_directory_time";
-      const cacheDuration = 30 * 60 * 1000; // 30 minutes cache
+      var cacheKey = 'sais_directory_cache_v1';
+      var cachedTimeKey = 'sais_directory_time_v1';
+      var cachedData = localStorage.getItem(cacheKey);
+      var cachedTime = localStorage.getItem(cachedTimeKey);
+      var now = new Date().getTime();
 
-      const cachedData = localStorage.getItem(cacheKey);
-      const cachedTime = localStorage.getItem(cacheTimeKey);
-      const now = new Date().getTime();
-
-      if (cachedData && cachedTime && (now - cachedTime < cacheDuration)) {
+      // Use cache if less than 1 hour old
+      if (cachedData && cachedTime && (now - cachedTime < 3600000)) {
         try {
-          const data = JSON.parse(cachedData);
-          processLoadedData(data);
-          return;
+          allBusinesses = JSON.parse(cachedData);
+          if (Array.isArray(allBusinesses) && allBusinesses.length > 0) {
+            initDirectory();
+            return;
+          }
         } catch (e) {
-          console.warn("Cache parse failed, fetching fresh data...");
+          // If parse fails, proceed to fetch
         }
       }
 
       try {
-        const response = await fetch(APPS_SCRIPT_URL);
+        var response = await fetch(APPS_SCRIPT_URL);
         if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-
-        localStorage.setItem(cacheKey, JSON.stringify(data));
-        localStorage.setItem(cacheTimeKey, now);
-
-        processLoadedData(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+        var data = await response.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+          allBusinesses = data;
+          localStorage.setItem(cacheKey, JSON.stringify(data));
+          localStorage.setItem(cachedTimeKey, now);
+          initDirectory();
+        } else if (data && Array.isArray(data.data)) {
+          allBusinesses = data.data;
+          localStorage.setItem(cacheKey, JSON.stringify(allBusinesses));
+          localStorage.setItem(cachedTimeKey, now);
+          initDirectory();
+        } else {
+          throw new Error('Invalid data structure received');
+        }
+      } catch (err) {
         if (cachedData) {
           try {
-            const data = JSON.parse(cachedData);
-            processLoadedData(data);
+            allBusinesses = JSON.parse(cachedData);
+            initDirectory();
             return;
-          } catch (e) {}
+          } catch (e2) {}
         }
-        loadingState.style.display = 'none';
-        errorState.style.display = 'block';
-        errorMessage.textContent = 'Could not load directory data. Please check your connection or try again later.';
+        showError(err.message);
       }
     }
 
-    function processLoadedData(data) {
-      allBusinesses = Array.isArray(data) ? data : (data.businesses || data.data || []);
+    function showError(msg) {
       loadingState.style.display = 'none';
+      errorState.style.display = 'block';
+      if (msg) errorMessage.textContent = msg;
+    }
 
-      if (allBusinesses.length === 0) {
-        emptyState.style.display = 'block';
-        return;
-      }
-
+    function initDirectory() {
+      loadingState.style.display = 'none';
       populateDropdowns();
       filterData();
     }
@@ -1148,9 +1157,9 @@
         var cat = getCategory(b);
         var loc = getLocation(b);
         var desc = getDescription(b).toLowerCase();
-        var address = getAddress(b).toLowerCase();
+        var addr = getAddress(b).toLowerCase();
 
-        var matchesSearch = !query || name.includes(query) || desc.includes(query) || loc.toLowerCase().includes(query) || address.includes(query) || cat.toLowerCase().includes(query);
+        var matchesSearch = !query || name.indexOf(query) !== -1 || desc.indexOf(query) !== -1 || loc.toLowerCase().indexOf(query) !== -1 || addr.indexOf(query) !== -1 || cat.toLowerCase().indexOf(query) !== -1;
         var matchesCat = !selectedCat || cat === selectedCat;
         var matchesLoc = !selectedLoc || loc === selectedLoc;
 
@@ -1163,7 +1172,7 @@
 
     function renderGrid() {
       directoryGrid.innerHTML = '';
-
+      
       if (filteredBusinesses.length === 0) {
         directoryGrid.style.display = 'none';
         pagination.style.display = 'none';
@@ -1179,24 +1188,23 @@
 
       var start = (currentPage - 1) * pageSize;
       var end = start + pageSize;
-      var pageItems = filteredBusinesses.slice(start, end);
+      var paginatedItems = filteredBusinesses.slice(start, end);
 
-      pageItems.forEach(function(b) {
+      paginatedItems.forEach(function(b) {
         var card = document.createElement('div');
         card.className = 'business-card';
-
+        
         var cat = getCategory(b);
         var name = getName(b);
         var loc = getLocation(b);
 
-        card.innerHTML = `
-          <div>
-            <div class="card-category">${escapeHtml(cat)}</div>
-            <div class="card-title">${escapeHtml(name)}</div>
-            <div class="card-location">📍 ${escapeHtml(loc)}</div>
-          </div>
-          <div class="card-btn">View Details</div>
-        `;
+        card.innerHTML = 
+          '<div>' +
+            '<div class="card-category">' + escapeHtml(cat) + '</div>' +
+            '<h3 class="card-title">' + escapeHtml(name) + '</h3>' +
+            '<div class="card-location">📍 ' + escapeHtml(loc) + '</div>' +
+          '</div>' +
+          '<button class="card-btn" type="button">View Details →</button>';
 
         card.addEventListener('click', function() {
           openModal(b);
@@ -1205,7 +1213,7 @@
         directoryGrid.appendChild(card);
       });
 
-      if (filteredBusinesses.length > pageSize) {
+      if (totalPages > 1) {
         pagination.style.display = 'flex';
         pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
         prevBtn.disabled = currentPage === 1;
@@ -1224,54 +1232,31 @@
       detailsContainer.innerHTML = '';
 
       var desc = getDescription(b);
-      if (desc) {
-        detailsContainer.innerHTML += `
-          <div class="detail-item">
-            <strong>About / Services</strong>
-            <p>${escapeHtml(desc)}</p>
-          </div>
-        `;
-      }
-
-      var address = getAddress(b);
-      if (address) {
-        detailsContainer.innerHTML += `
-          <div class="detail-item">
-            <strong>Address</strong>
-            <p>${escapeHtml(address)}</p>
-          </div>
-        `;
-      }
-
+      var addr = getAddress(b);
       var phone = getPhone(b);
-      if (phone) {
-        detailsContainer.innerHTML += `
-          <div class="detail-item">
-            <strong>Phone Number</strong>
-            <a class="phone-link" href="tel:${escapeHtml(phone)}">📞 ${escapeHtml(phone)}</a>
-          </div>
-        `;
-      }
-
       var email = getEmail(b);
+      var web = getWebsite(b);
+
+      if (desc) {
+        detailsContainer.innerHTML += '<div class="detail-item"><strong>About / Services</strong>' + escapeHtml(desc) + '</div>';
+      }
+      if (addr) {
+        detailsContainer.innerHTML += '<div class="detail-item"><strong>Address</strong>' + escapeHtml(addr) + '</div>';
+      }
+      if (phone) {
+        var cleanPhone = phone.replace(/[^0-9+]/g, '');
+        detailsContainer.innerHTML += '<div class="detail-item"><strong>Telephone</strong><a class="phone-link" href="tel:' + cleanPhone + '">📞 ' + escapeHtml(phone) + '</a></div>';
+      }
       if (email) {
-        detailsContainer.innerHTML += `
-          <div class="detail-item">
-            <strong>Email Address</strong>
-            <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a>
-          </div>
-        `;
+        detailsContainer.innerHTML += '<div class="detail-item"><strong>Email</strong><a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + '</a></div>';
+      }
+      if (web) {
+        var formatWeb = web.startsWith('http') ? web : 'https://' + web;
+        detailsContainer.innerHTML += '<div class="detail-item"><strong>Website</strong><a href="' + escapeHtml(formatWeb) + '" target="_blank" rel="noopener">' + escapeHtml(web) + ' ↗</a></div>';
       }
 
-      var website = getWebsite(b);
-      if (website) {
-        var formattedUrl = website.startsWith('http') ? website : 'https://' + website;
-        detailsContainer.innerHTML += `
-          <div class="detail-item">
-            <strong>Website</strong>
-            <a href="${escapeHtml(formattedUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(website)} ↗</a>
-          </div>
-        `;
+      if (!desc && !addr && !phone && !email && !web) {
+        detailsContainer.innerHTML = '<div class="text-muted-fallback">No additional contact details provided for this listing.</div>';
       }
 
       businessModal.classList.add('active');
@@ -1279,38 +1264,16 @@
       document.body.style.overflow = 'hidden';
     }
 
-    function closeModal() {
+    function closeModalFunc() {
       businessModal.classList.remove('active');
       businessModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
     }
 
-    function escapeHtml(text) {
-      var map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      };
-      return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
-    }
-
     function setupEventListeners() {
-      hamburgerBtn.addEventListener('click', toggleMenu);
-      menuOverlay.addEventListener('click', closeMenu);
-
-      searchInput.addEventListener('input', function() {
-        filterData();
-      });
-
-      categoryFilter.addEventListener('change', function() {
-        filterData();
-      });
-
-      locationFilter.addEventListener('change', function() {
-        filterData();
-      });
+      searchInput.addEventListener('input', filterData);
+      categoryFilter.addEventListener('change', filterData);
+      locationFilter.addEventListener('change', filterData);
 
       clearButton.addEventListener('click', function() {
         searchInput.value = '';
@@ -1336,19 +1299,34 @@
         }
       });
 
-      modalClose.addEventListener('click', closeModal);
+      modalClose.addEventListener('click', closeModalFunc);
       businessModal.addEventListener('click', function(e) {
-        if (e.target === businessModal) {
-          closeModal();
-        }
+        if (e.target === businessModal) closeModalFunc();
       });
 
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-          closeModal();
+          closeModalFunc();
           closeMenu();
         }
       });
+
+      hamburgerBtn.addEventListener('click', toggleMenu);
+      menuOverlay.addEventListener('click', closeMenu);
+
+      headerLinks.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', closeMenu);
+      });
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
   </script>
 </body>
