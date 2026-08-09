@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SAIS Animal Services Directory</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- iframeResizer library for automatic Google Sites height adjustment -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.2/iframeResizer.contentWindow.min.js"></script>
+
+  <style>
+    :root {
+      --brand-red: #c82333;
+      --brand-red-hover: #9e1b28;
+      --brand-red-light: #fef2f2;
+      
+      --neutral-900: #0f172a;
+      --neutral-700: #334155;
+      --neutral-500: #64748b;
+      --neutral-200: #e2e8f0;
+      --neutral-100: #f8fafc;
+      
+      /* Updated with soft red-tinted backgrounds */
+      --bg-main: #fcf4f4;
+      --bg-header: #fffafa;
+      --card-bg: #ffffff;
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      
+      --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.12);
+
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+      background-color: var(--bg-main);
+      color: var(--neutral-700);
+      line-height: 1.5;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* HEADER NAV */
+    header {
+      background-color: var(--bg-header);
+      border-bottom: 1px solid #f3dada;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: clamp(1rem, 2.5vw, 1.15rem);
+      font-weight: 800;
+      color: var(--neutral-900);
+      letter-spacing: -0.02em;
+      display: flex;
+      flex-direction: column;
+      z-index: 101;
+    }
+
+    .logo-small {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--brand-red);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .header-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-links a {
+      text-decoration: none;
+      color: var(--neutral-700);
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: color 0.15s ease;
+    }
+
+    .header-links a:hover {
+      color: var(--brand-red);
+    }
+
+    .header-links a.add-link {
+      background-color: var(--brand-red);
+      color: #ffffff !important;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      transition: background-color 0.15s ease;
+    }
+
+    .header-links a.add-link:hover {
+      background-color: var(--brand-red-hover);
+    }
+
+    /* HAMBURGER BUTTON */
+    .hamburger-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 28px;
+      height: 22px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 101;
+    }
+
+    .hamburger-toggle span {
+      width: 100%;
+      height: 3px;
+      background-color: var(--neutral-900);
+      border-radius: 2px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .hamburger-toggle.is-active span:nth-child(1) {
+      transform: translateY(9.5px) rotate(45deg);
+    }
+
+    .hamburger-toggle.is-active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-toggle.is-active span:nth-child(3) {
+      transform: translateY(-9.5px) rotate(-45deg);
+    }
+
+    .menu-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(2px);
+      z-index: 98;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .menu-overlay.is-active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* HERO SECTION */
+    .hero-banner-wrapper {
+      position: relative;
+      width: 100%;
+      background: linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.65)), 
+                  url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
+      padding: 60px 16px;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-md);
+      color: #ffffff;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .hero p.tagline {
+      color: #f1f5f9;
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      font-weight: 500;
+      max-width: 720px;
+      margin: 0 auto 24px auto;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .why-use-box {
+      display: inline-block;
+      width: 100%;
+      max-width: 560px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 16px 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: var(--shadow-md);
+      margin-bottom: 28px;
+    }
+
+    .why-use-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: var(--neutral-500);
+      margin-bottom: 10px;
+    }
+
+    .why-use-badges {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .badge-item {
+      font-size: clamp(0.85rem, 2vw, 0.95rem);
+      font-weight: 700;
+      color: var(--neutral-900);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* FILTER SECTION */
+    .filter-section {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: var(--shadow-lg);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 0.98rem;
+      font-weight: 500;
+      color: var(--neutral-900);
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      outline: none;
+      background-color: #ffffff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--brand-red);
+      box-shadow: 0 0 0 3px rgba(200, 35, 51, 0.15);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--neutral-700);
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-md);
+      background-color: #ffffff;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    select:focus {
+      border-color: var(--brand-red);
+    }
+
+    .clear-button {
+      padding: 12px 18px;
+      background-color: #ffffff;
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--neutral-700);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .clear-button:hover {
+      background-color: var(--brand-red);
+      color: #ffffff;
+      border-color: var(--brand-red);
+    }
+
+    /* CONTAINER */
+    .container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 16px;
+      flex: 1;
+    }
+
+    /* ADVERTISE BANNER */
+    .advertise-card {
+      position: relative;
+      background: linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.72)), 
+                  url('https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmly1JFUPkA71F9847Lmb57SDpYUhFVqxSTYZjx__pkyYPZnITmBkyWS4GOw6LG7_fbB8B3WgQPAQnLlR9kdOa5uRp7SXyoNAK_8YseWmXvVkGfjt3DFniYGQxDfmg_44TQ1IIr2YLqt067=s1360-w1360-h1020-rw') center/cover no-repeat;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: var(--shadow-md);
+      color: #ffffff;
+    }
+
+    .advertise-content {
+      max-width: 760px;
+    }
+
+    .advertise-content h2 {
+      font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .advertise-content h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #ff8a95;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .advertise-content p {
+      font-size: 0.9rem;
+      color: #f1f5f9;
+      line-height: 1.5;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .advertise-btn {
+      display: inline-block;
+      background-color: var(--brand-red);
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      transition: background-color 0.15s ease, transform 0.15s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .advertise-btn:hover {
+      background-color: var(--brand-red-hover);
+      transform: translateY(-1px);
+    }
+
+    /* DIRECTORY GRID */
+    .directory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .business-card {
+      background: var(--card-bg);
+      border: 1px solid #f0d5d7;
+      border-radius: var(--radius-md);
+      padding: 18px;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .business-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--brand-red);
+    }
+
+    .card-category {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: var(--brand-red);
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--neutral-900);
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+
+    .card-location {
+      font-size: 0.88rem;
+      color: var(--neutral-500);
+      font-weight: 500;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-btn {
+      align-self: flex-start;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--brand-red);
+      background: var(--brand-red-light);
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(200, 35, 51, 0.2);
+      transition: all 0.15s ease;
+    }
+
+    .business-card:hover .card-btn {
+      background-color: var(--brand-red);
+      color: #ffffff;
+      border-color: var(--brand-red);
+    }
+
+    /* PAGINATION */
+    .pagination-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+      margin-bottom: 32px;
+      padding: 12px 16px;
+      background: #ffffff;
+      border: 1px solid #f0d5d7;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      gap: 8px;
+    }
+
+    .pagination-btn {
+      padding: 8px 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--neutral-900);
+      background-color: #ffffff;
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background-color: var(--brand-red);
+      color: #ffffff;
+      border-color: var(--brand-red);
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .pagination-info {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--neutral-700);
+      text-align: center;
+    }
+
+    /* STATE CONTAINERS */
+    .state-container {
+      text-align: center;
+      padding: 40px 16px;
+      background: #fff;
+      border-radius: var(--radius-lg);
+      border: 1px solid #f0d5d7;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 32px;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--neutral-200);
+      border-top: 3px solid var(--brand-red);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .placeholder {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--neutral-200);
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: var(--neutral-100);
+      border: 1px solid var(--neutral-200);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 1.1rem;
+      color: var(--neutral-700);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      z-index: 10;
+    }
+
+    .modal-close:hover {
+      background: var(--brand-red);
+      color: #ffffff;
+      border-color: var(--brand-red);
+    }
+
+    .modal-header {
+      padding: 20px 20px 16px 20px;
+      border-bottom: 1px solid var(--neutral-200);
+      padding-right: 50px;
+    }
+
+    .modal-category {
+      display: inline-block;
+      background-color: var(--brand-red-light);
+      color: var(--brand-red);
+      border: 1px solid rgba(200, 35, 51, 0.2);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .modal-header h2 {
+      font-size: clamp(1.2rem, 3vw, 1.45rem);
+      font-weight: 800;
+      color: var(--neutral-900);
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .modal-location {
+      color: var(--neutral-500);
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .details-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .detail-item {
+      font-size: 0.92rem;
+      color: var(--neutral-900);
+    }
+
+    .detail-item strong {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--neutral-500);
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .modal-body a {
+      color: var(--brand-red);
+      font-weight: 600;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .modal-body a:hover {
+      text-decoration: underline;
+    }
+
+    .phone-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--brand-red-light);
+      color: var(--brand-red) !important;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      text-decoration: none !important;
+      font-weight: 700 !important;
+      font-size: 0.88rem;
+      border: 1px solid rgba(200, 35, 51, 0.2);
+      margin-top: 2px;
+      transition: all 0.15s ease;
+    }
+
+    .phone-link:hover {
+      background-color: var(--brand-red);
+      color: #ffffff !important;
+      border-color: var(--brand-red);
+    }
+
+    .social-links-container {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .social-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background-color: var(--neutral-100);
+      color: var(--neutral-900) !important;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      text-decoration: none !important;
+      font-weight: 600;
+      border: 1px solid var(--neutral-200);
+      transition: all 0.15s ease;
+    }
+
+    .social-badge:hover {
+      background-color: var(--brand-red);
+      color: #ffffff !important;
+      border-color: var(--brand-red);
+    }
+
+    .text-muted-fallback {
+      color: var(--neutral-500);
+      font-style: italic;
+      font-size: 0.88rem;
+    }
+
+    .modal-footer-note {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--neutral-500);
+      text-align: center;
+      padding: 12px 20px;
+      background-color: var(--neutral-100);
+      border-top: 1px solid var(--neutral-200);
+    }
+
+    /* FOOTER */
+    footer {
+      background-color: var(--bg-header);
+      border-top: 1px solid #f3dada;
+      padding: 24px 16px 20px 16px;
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 0.82rem;
+      color: var(--neutral-500);
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f0d5d7;
+    }
+
+    .footer-copyright {
+      max-width: 650px;
+      line-height: 1.5;
+    }
+
+    .footer-copyright a {
+      color: var(--neutral-900);
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .footer-contact {
+      max-width: 380px;
+      line-height: 1.5;
+    }
+
+    .footer-contact strong {
+      color: var(--neutral-900);
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.88rem;
+    }
+
+    .footer-contact a {
+      color: var(--brand-red);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .footer-contact a:hover {
+      text-decoration: underline;
+    }
+
+    /* MOBILE & IPAD / TABLET MEDIA QUERIES */
+    @media (max-width: 1024px) {
+      .hamburger-toggle {
+        display: flex;
+      }
+
+      .header-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        height: 100vh;
+        background-color: #ffffff;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 80px 24px 24px 24px;
+        box-shadow: -4px 0 16px rgba(0,0,0,0.15);
+        transition: right 0.3s ease-in-out;
+        z-index: 100;
+      }
+
+      .header-links.is-active {
+        right: 0;
+      }
+
+      .header-links a {
+        font-size: 1rem;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--neutral-200);
+      }
+
+      .header-links a.add-link {
+        text-align: center;
+        margin-top: 12px;
+        border-bottom: none;
+        padding: 12px 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 1rem; }
+      .hero-banner-wrapper { padding: 40px 16px; }
+      .advertise-card { flex-direction: column; align-items: flex-start; }
+      .advertise-btn { width: 100%; text-align: center; }
+    }
+
+    @media (max-width: 600px) {
+      .why-use-badges { flex-direction: column; align-items: center; gap: 8px; }
+      .directory-grid { grid-template-columns: 1fr; }
+      .filters-grid { grid-template-columns: 1fr; }
+      .pagination-container { flex-direction: column; gap: 10px; }
+      .pagination-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="menuOverlay" class="menu-overlay"></div>
+
+  <header>
+    <div class="logo">
+      Somerset Animal Business Directory
+      <span class="logo-small">Somerset Animal Information Services</span>
+    </div>
+
+    <button id="hamburgerBtn" class="hamburger-toggle" type="button" aria-label="Toggle Navigation Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav id="headerLinks" class="header-links">
+      <a href="https://www.somersetanimalinformationservices.com/" target="_top">Main Page</a>
+      <a href="https://information.somersetanimalinformationservices.com/" target="_top">Information Hub UK</a>
+      <a class="add-link" href="https://docs.google.com/forms/d/e/1FAIpQLSdWV3d-R7vjA_HB0_hBLr0b32ONpuUdjmVv0RGwmJBWkfd_1Q/viewform?usp=header" target="_top">+ Add / Remove Business</a>
+    </nav>
+  </header>
+
+  <section class="hero-banner-wrapper">
+    <div class="hero-content">
+      <div class="hero">
+        <h1>Somerset Animal Business Directory</h1>
+        <p class="tagline">Connecting pet owners with award-winning, trusted animal businesses across Somerset.</p>
+        
+        <div class="why-use-box">
+          <div class="why-use-title">Why Use Somerset Animal Business Directory?</div>
+          <div class="why-use-badges">
+            <div class="badge-item">🐾 Local Businesses</div>
+            <div class="badge-item">🏥 Trusted Services</div>
+            <div class="badge-item">📢 Free Listings</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <input id="search" class="search-input" type="search" placeholder="Search by business name, service, or town..." autocomplete="off">
+        
+        <div class="filters-grid">
+          <select id="categoryFilter">
+            <option value="">All Categories</option>
+          </select>
+
+          <select id="locationFilter">
+            <option value="">All Locations</option>
+          </select>
+
+          <button id="clearButton" class="clear-button" type="button">Clear Filters</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="advertise-card">
+      <div class="advertise-content">
+        <h2>Advertise Your Business</h2>
+        <h3>Why Join?</h3>
+        <p>Boost your visibility with Somerset pet owners, attract new clients through a professional business listing, and become part of a trusted local network of animal professionals. Showcase your services, strengthen your brand, and grow your reputation as a recognised name in Somerset’s animal community.</p>
+      </div>
+      <a class="advertise-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdWV3d-R7vjA_HB0_hBLr0b32ONpuUdjmVv0RGwmJBWkfd_1Q/viewform?usp=header" target="_top">List Your Business Free</a>
+    </div>
+
+    <div id="loadingState" class="state-container">
+      <div class="spinner"></div>
+      <h2>Loading directory</h2>
+      <p>Connecting to business registry...</p>
+    </div>
+
+    <div id="errorState" class="state-container" style="display: none;">
+      <div class="placeholder">⚠️</div>
+      <h2>Directory could not be loaded</h2>
+      <p id="errorMessage">Please refresh or try again shortly.</p>
+    </div>
+
+    <div id="emptyState" class="state-container" style="display: none;">
+      <div class="placeholder">🔎</div>
+      <h2>No listings found</h2>
+      <p>Try adjusting your search terms or clearing your filter criteria.</p>
+    </div>
+
+    <div id="directoryGrid" class="directory-grid" style="display: none;"></div>
+
+    <div id="pagination" class="pagination-container" style="display: none;">
+      <button id="prevBtn" class="pagination-btn" type="button">← Previous</button>
+      <span id="pageInfo" class="pagination-info">Page 1 of 1</span>
+      <button id="nextBtn" class="pagination-btn" type="button">Next →</button>
+    </div>
+  </div>
+
+  <div id="businessModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <button id="modalClose" class="modal-close" type="button" aria-label="Close details">✕</button>
+
+      <div class="modal-header">
+        <div id="modalCategory" class="modal-category">Animal Service</div>
+        <h2 id="modalBusinessName">Business Name</h2>
+        <div id="modalLocation" class="modal-location"></div>
+      </div>
+
+      <div class="modal-body">
+        <div id="modalDetails" class="details-grid"></div>
+      </div>
+
+      <div class="modal-footer-note">Somerset Animal Information Services</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-copyright">
+          <p>© 2026 Somerset Animal Business Directory. All rights reserved.</p>
+          <p>Content and images are protected under the Copyright, Designs and Patents Act 1988. Unauthorised use is strictly prohibited. | <a href="https://www.somersetanimalinformationservices.com/copyright-notice" target="_top">Copyright Notice</a></p>
+        </div>
+        <div class="footer-contact">
+          <strong>Contact Us</strong>
+          <p>Email: <a href="mailto:website-support-admin@somersetanimalinformationservices.com">website-support-admin@somersetanimalinformationservices.com</a></p>
+          <p>For enquiries, updates, or removal of listings, please contact us via email.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    var allBusinesses = [];
+    var filteredBusinesses = [];
+    var currentPage = 1;
+    var pageSize = 50;
+
+    var loadingState = document.getElementById('loadingState');
+    var errorState = document.getElementById('errorState');
+    var emptyState = document.getElementById('emptyState');
+    var errorMessage = document.getElementById('errorMessage');
+    var directoryGrid = document.getElementById('directoryGrid');
+    
+    var pagination = document.getElementById('pagination');
+    var prevBtn = document.getElementById('prevBtn');
+    var nextBtn = document.getElementById('nextBtn');
+    var pageInfo = document.getElementById('pageInfo');
+
+    var searchInput = document.getElementById('search');
+    var categoryFilter = document.getElementById('categoryFilter');
+    var locationFilter = document.getElementById('locationFilter');
+    var clearButton = document.getElementById('clearButton');
+
+    var businessModal = document.getElementById('businessModal');
+    var modalClose = document.getElementById('modalClose');
+
+    var hamburgerBtn = document.getElementById('hamburgerBtn');
+    var headerLinks = document.getElementById('headerLinks');
+    var menuOverlay = document.getElementById('menuOverlay');
+
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchDirectoryData();
+      setupEventListeners();
+    });
+
+    function toggleMenu() {
+      var isActive = hamburgerBtn.classList.toggle('is-active');
+      headerLinks.classList.toggle('is-active');
+      menuOverlay.classList.toggle('is-active');
+    }
+
+    function closeMenu() {
+      hamburgerBtn.classList.remove('is-active');
+      headerLinks.classList.remove('is-active');
+      menuOverlay.classList.remove('is-active');
+    }
+
+    function getVal(b, keys) {
+      if (!b) return '';
+      for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        for (var prop in b) {
+          if (prop.toLowerCase().trim() === key.toLowerCase().trim() && b[prop]) {
+            return String(b[prop]).trim();
+          }
+        }
+      }
+      return '';
+    }
+
+    function getName(b) { return getVal(b, ['Business Name', 'Name', 'Business', 'Company']) || 'Business Name'; }
+    function getCategory(b) { return getVal(b, ['Category', 'Category Name', 'Service Category', 'Services Offered', 'Type']) || 'Animal Service'; }
+    function getLocation(b) { return getVal(b, ['Area / Town', 'Location', 'Town', 'Area', 'City']) || 'Somerset'; }
+    function getWebsite(b) { return getVal(b, ['Website', 'Web', 'URL', 'Link', 'Site']); }
+    function getPhone(b) { return getVal(b, ['Phone', 'Telephone', 'Contact Number', 'Mobile', 'Tel']); }
+    function getEmail(b) { return getVal(b, ['Email', 'Email Address', 'Contact Email']); }
+    function getAddress(b) { return getVal(b, ['Address', 'Full Address', 'Postal Address']); }
+    function getDescription(b) { return getVal(b, ['Description', 'Services', 'About', 'Notes', 'Details']); }
+
+    function fetchDirectoryData() {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(onDataLoaded)
+          .withFailureHandler(function(err) {
+            showError("Failed to retrieve directory data: " + (err.message || err));
+          })
+          .getDirectoryData();
+      } else {
+        showError("Apps Script environment missing or unreachable.");
+      }
+    }
+
+    function onDataLoaded(data) {
+      if (!data || !data.businesses || data.businesses.length === 0) {
+        showError("No directory records were found in the Google Sheet.");
+        return;
+      }
+
+      allBusinesses = data.businesses;
+      loadingState.style.display = 'none';
+      filteredBusinesses = allBusinesses;
+      populateFilterOptions();
+      currentPage = 1;
+      renderCurrentPage();
+    }
+
+    function showError(msg) {
+      loadingState.style.display = 'none';
+      errorMessage.innerText = msg;
+      errorState.style.display = 'block';
+    }
+
+    function populateFilterOptions() {
+      categoryFilter.innerHTML = '<option value="">All Categories</option>';
+      locationFilter.innerHTML = '<option value="">All Locations</option>';
+
+      var categories = {};
+      var locations = {};
+
+      allBusinesses.forEach(function(b) {
+        var cat = getCategory(b);
+        if (cat && cat !== 'Animal Service') categories[cat] = true;
+        var loc = getLocation(b);
+        if (loc && loc !== 'Somerset') locations[loc] = true;
+      });
+
+      Object.keys(categories).sort().forEach(function(cat) {
+        var opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        categoryFilter.appendChild(opt);
+      });
+
+      Object.keys(locations).sort().forEach(function(loc) {
+        var opt = document.createElement('option');
+        opt.value = loc;
+        opt.textContent = loc;
+        locationFilter.appendChild(opt);
+      });
+    }
+
+    function filterDirectory() {
+      var query = searchInput.value.toLowerCase().trim();
+      var selectedCategory = categoryFilter.value;
+      var selectedLocation = locationFilter.value;
+
+      filteredBusinesses = allBusinesses.filter(function(b) {
+        var name = getName(b).toLowerCase();
+        var cat = getCategory(b).toLowerCase();
+        var loc = getLocation(b).toLowerCase();
+        var desc = getDescription(b).toLowerCase();
+
+        var matchesQuery = !query || name.indexOf(query) !== -1 || cat.indexOf(query) !== -1 || loc.indexOf(query) !== -1 || desc.indexOf(query) !== -1;
+        var matchesCategory = !selectedCategory || getCategory(b) === selectedCategory;
+        var matchesLocation = !selectedLocation || getLocation(b) === selectedLocation;
+
+        return matchesQuery && matchesCategory && matchesLocation;
+      });
+
+      currentPage = 1;
+      renderCurrentPage();
+    }
+
+    function renderCurrentPage() {
+      if (filteredBusinesses.length === 0) {
+        directoryGrid.style.display = 'none';
+        pagination.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      directoryGrid.style.display = 'grid';
+
+      var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      var startIndex = (currentPage - 1) * pageSize;
+      var endIndex = startIndex + pageSize;
+      var pageItems = filteredBusinesses.slice(startIndex, endIndex);
+
+      renderDirectory(pageItems);
+      updatePaginationControls(totalPages);
+    }
+
+    function renderDirectory(businesses) {
+      directoryGrid.innerHTML = '';
+
+      businesses.forEach(function(b) {
+        var card = document.createElement('div');
+        card.className = 'business-card';
+        card.onclick = function() { openModal(b); };
+
+        var category = getCategory(b);
+        var name = getName(b);
+        var location = getLocation(b);
+
+        card.innerHTML = 
+          '<div>' +
+            '<div class="card-category">' + escapeHtml(category) + '</div>' +
+            '<div class="card-title">' + escapeHtml(name) + '</div>' +
+            '<div class="card-location">📍 ' + escapeHtml(location) + '</div>' +
+          '</div>' +
+          '<div class="card-btn">View Details</div>';
+
+        directoryGrid.appendChild(card);
+      });
+    }
+
+    function updatePaginationControls(totalPages) {
+      if (totalPages <= 1) {
+        pagination.style.display = 'none';
+        return;
+      }
+
+      pagination.style.display = 'flex';
+      pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
+
+      prevBtn.disabled = (currentPage === 1);
+      nextBtn.disabled = (currentPage === totalPages);
+    }
+
+    function openModal(b) {
+      document.getElementById('modalCategory').textContent = getCategory(b);
+      document.getElementById('modalBusinessName').textContent = getName(b);
+      document.getElementById('modalLocation').textContent = '📍 ' + getLocation(b);
+
+      var rawWebsite = getWebsite(b);
+      var websiteHtml = '<span class="text-muted-fallback">Website unavailable</span>';
+      if (rawWebsite) {
+        var formattedUrl = rawWebsite.indexOf('http') === 0 ? rawWebsite : ('https://' + rawWebsite);
+        websiteHtml = '<a href="' + escapeHtml(formattedUrl) + '" target="_top">' + escapeHtml(rawWebsite) + '</a>';
+      }
+
+      var rawPhone = getPhone(b);
+      var phoneHtml = '<span class="text-muted-fallback">Not provided</span>';
+      if (rawPhone) {
+        var cleanPhoneDigits = rawPhone.replace(/[^0-9+]/g, '');
+        phoneHtml = '<a class="phone-link" href="tel:' + escapeHtml(cleanPhoneDigits) + '">📞 ' + escapeHtml(rawPhone) + '</a>';
+      }
+
+      var facebook = getVal(b, ['Facebook', 'FB']);
+      var instagram = getVal(b, ['Instagram', 'IG']);
+      var twitter = getVal(b, ['X', 'Twitter']);
+
+      var socialLinks = [];
+      if (facebook) socialLinks.push('<a href="' + escapeHtml(formatUrl(facebook)) + '" target="_top" class="social-badge">Facebook</a>');
+      if (instagram) socialLinks.push('<a href="' + escapeHtml(formatUrl(instagram)) + '" target="_top" class="social-badge">Instagram</a>');
+      if (twitter) socialLinks.push('<a href="' + escapeHtml(formatUrl(twitter)) + '" target="_top" class="social-badge">X (Twitter)</a>');
+
+      var socialsHtml = '<span class="text-muted-fallback">Socials unavailable</span>';
+      if (socialLinks.length > 0) {
+        socialsHtml = '<div class="social-links-container">' + socialLinks.join('') + '</div>';
+      }
+
+      var email = getEmail(b);
+      var address = getAddress(b);
+      var description = getDescription(b);
+
+      var detailsGrid = document.getElementById('modalDetails');
+      detailsGrid.innerHTML = 
+        '<div class="detail-item">' +
+          '<strong>Phone Number</strong>' +
+          phoneHtml +
+        '</div>' +
+        '<div class="detail-item">' +
+          '<strong>Website</strong>' +
+          websiteHtml +
+        '</div>' +
+        '<div class="detail-item">' +
+          '<strong>Social Media</strong>' +
+          socialsHtml +
+        '</div>' +
+        '<div class="detail-item">' +
+          '<strong>Email</strong>' +
+          (email ? ('<a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + '</a>') : '<span class="text-muted-fallback">Not provided</span>') +
+        '</div>' +
+        (address ? ('<div class="detail-item"><strong>Address</strong>' + escapeHtml(address) + '</div>') : '') +
+        (description ? ('<div class="detail-item"><strong>Description / Services</strong>' + escapeHtml(description) + '</div>') : '');
+
+      businessModal.classList.add('active');
+      businessModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      businessModal.classList.remove('active');
+      businessModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function formatUrl(url) {
+      if (!url) return '#';
+      return (url.indexOf('http://') === 0 || url.indexOf('https://') === 0) ? url : ('https://' + url);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function setupEventListeners() {
+      hamburgerBtn.addEventListener('click', toggleMenu);
+      menuOverlay.addEventListener('click', closeMenu);
+
+      searchInput.addEventListener('input', filterDirectory);
+      categoryFilter.addEventListener('change', filterDirectory);
+      locationFilter.addEventListener('change', filterDirectory);
+
+      clearButton.addEventListener('click', function() {
+        searchInput.value = '';
+        categoryFilter.value = '';
+        locationFilter.value = '';
+        filterDirectory();
+      });
+
+      prevBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+          currentPage--;
+          renderCurrentPage();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+
+      nextBtn.addEventListener('click', function() {
+        var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderCurrentPage();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+
+      modalClose.addEventListener('click', closeModal);
+      businessModal.addEventListener('click', function(e) {
+        if (e.target === businessModal) closeModal();
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          if (businessModal.classList.contains('active')) closeModal();
+          closeMenu();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
