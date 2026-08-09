@@ -234,19 +234,18 @@
       fetch(APPS_SCRIPT_URL)
         .then(function(res) { return res.json(); })
         .then(function(data) {
-          // Direct mapping using standard exact property names from your original working script
           var rawData = Array.isArray(data) ? data : (data.data || []);
           
           allBusinesses = rawData.map(function(item) {
             return {
-              name: item.name || item['Business Name'] || item.BusinessName || '',
-              category: item.category || item.Category || '',
-              location: item.location || item.Town || item.Location || '',
-              description: item.description || item.Description || '',
-              phone: item.phone || item.Phone || item.Telephone || '',
-              email: item.email || item.Email || '',
-              website: item.website || item.Website || '',
-              address: item.address || item.Address || ''
+              name: findValue(item, ['name', 'business name', 'business', 'company', 'title']),
+              category: findValue(item, ['category', 'service', 'type', 'business type']),
+              location: findValue(item, ['location', 'town', 'city', 'area', 'address town']),
+              description: findValue(item, ['description', 'details', 'about', 'summary']),
+              phone: findValue(item, ['phone', 'telephone', 'mobile', 'contact number']),
+              email: findValue(item, ['email', 'contact email', 'mail']),
+              website: findValue(item, ['website', 'web', 'url', 'link']),
+              address: findValue(item, ['address', 'street address', 'full address'])
             };
           }).filter(function(item) { return item.name !== ''; });
 
@@ -278,6 +277,22 @@
       businessModal.addEventListener('click', function(e) { if (e.target === businessModal) businessModal.classList.remove('active'); });
     });
 
+    function findValue(obj, possibleKeys) {
+      if (!obj || typeof obj !== 'object') return '';
+      var objKeys = Object.keys(obj);
+      for (var i = 0; i < possibleKeys.length; i++) {
+        var target = possibleKeys[i].toLowerCase();
+        for (var j = 0; j < objKeys.length; j++) {
+          var currentKey = objKeys[j];
+          if (currentKey.toLowerCase().trim() === target) {
+            var val = obj[currentKey];
+            return val !== null && val !== undefined ? String(val).trim() : '';
+          }
+        }
+      }
+      return '';
+    }
+
     function populateDropdowns(items) {
       var cats = new Set();
       var locs = new Set();
@@ -300,7 +315,7 @@
       var loc = locationFilter.value;
 
       filteredBusinesses = allBusinesses.filter(function(item) {
-        var matchesQ = !q || item.name.toLowerCase().includes(q) || item.category.toLowerCase().includes(q) || item.location.toLowerCase().includes(q);
+        var matchesQ = !q || item.name.toLowerCase().includes(q) || item.category.toLowerCase().includes(q) || item.location.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
         var matchesCat = !cat || item.category === cat;
         var matchesLoc = !loc || item.location === loc;
         return matchesQ && matchesCat && matchesLoc;
@@ -338,6 +353,7 @@
           if (item.phone) details.innerHTML += '<div><strong>Phone:</strong> <a href="tel:' + escapeHtml(item.phone) + '">' + escapeHtml(item.phone) + '</a></div>';
           if (item.email) details.innerHTML += '<div><strong>Email:</strong> <a href="mailto:' + escapeHtml(item.email) + '">' + escapeHtml(item.email) + '</a></div>';
           if (item.website) details.innerHTML += '<div><strong>Website:</strong> <a href="' + escapeHtml(item.website) + '" target="_blank">' + escapeHtml(item.website) + '</a></div>';
+          if (item.address) details.innerHTML += '<div><strong>Address:</strong><p>' + escapeHtml(item.address) + '</p></div>';
           
           businessModal.classList.add('active');
         });
