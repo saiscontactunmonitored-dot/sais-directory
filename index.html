@@ -1074,38 +1074,42 @@
             allBusinesses = [];
           }
 
-          populateFilters(allBusinesses);
+          loadingState.style.display = 'none';
+
+          if (allBusinesses.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+          }
+
+          populateDropdowns();
           applyFilters();
-          showDirectory();
         })
         .catch(function(err) {
-          console.error('Error loading directory:', err);
-          showError('Failed to load listings. Please check your internet connection and try again.');
+          loadingState.style.display = 'none';
+          errorState.style.display = 'block';
+          if (errorMessage) {
+            errorMessage.textContent = err.message || 'Unable to connect to the directory database.';
+          }
         });
     }
 
-    function populateFilters(data) {
+    function populateDropdowns() {
       var categories = new Set();
       var locations = new Set();
 
-      data.forEach(function(item) {
+      allBusinesses.forEach(function(item) {
         if (item.category) categories.add(item.category.trim());
         if (item.location) locations.add(item.location.trim());
       });
 
-      var sortedCategories = Array.from(categories).sort();
-      var sortedLocations = Array.from(locations).sort();
-
-      categoryFilter.innerHTML = '<option value="">All Categories</option>';
-      sortedCategories.forEach(function(cat) {
+      Array.from(categories).sort().forEach(function(cat) {
         var opt = document.createElement('option');
         opt.value = cat;
         opt.textContent = cat;
         categoryFilter.appendChild(opt);
       });
 
-      locationFilter.innerHTML = '<option value="">All Locations</option>';
-      sortedLocations.forEach(function(loc) {
+      Array.from(locations).sort().forEach(function(loc) {
         var opt = document.createElement('option');
         opt.value = loc;
         opt.textContent = loc;
@@ -1149,8 +1153,8 @@
       });
 
       nextBtn.addEventListener('click', function() {
-        var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
-        if (currentPage < totalPages) {
+        var maxPage = Math.ceil(filteredBusinesses.length / pageSize);
+        if (currentPage < maxPage) {
           currentPage++;
           renderGrid();
           window.scrollTo({ top: directoryGrid.offsetTop - 100, behavior: 'smooth' });
@@ -1163,9 +1167,7 @@
       });
 
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && businessModal.classList.contains('active')) {
-          closeModal();
-        }
+        if (e.key === 'Escape') closeModal();
       });
     }
 
@@ -1181,44 +1183,46 @@
           (item.location && item.location.toLowerCase().includes(query)) ||
           (item.description && item.description.toLowerCase().includes(query));
 
-        var matchesCategory = !selectedCategory || item.category === selectedCategory;
-        var matchesLocation = !selectedLocation || item.location === selectedLocation;
+        var matchesCategory = !selectedCategory || (item.category && item.category.trim() === selectedCategory);
+        var matchesLocation = !selectedLocation || (item.location && item.location.trim() === selectedLocation);
 
         return matchesSearch && matchesCategory && matchesLocation;
       });
 
-      renderGrid();
+      if (filteredBusinesses.length === 0) {
+        directoryGrid.style.display = 'none';
+        pagination.style.display = 'none';
+        emptyState.style.display = 'block';
+      } else {
+        emptyState.style.display = 'none';
+        directoryGrid.style.display = 'grid';
+        renderGrid();
+      }
     }
 
     function renderGrid() {
       directoryGrid.innerHTML = '';
 
-      if (filteredBusinesses.length === 0) {
-        showEmpty();
-        return;
-      }
+      var totalPages = Math.ceil(filteredBusinesses.length / pageSize);
+      if (currentPage > totalPages) currentPage = totalPages || 1;
 
-      showDirectory();
+      var start = (currentPage - 1) * pageSize;
+      var end = start + pageSize;
+      var pageItems = filteredBusinesses.slice(start, end);
 
-      var totalPages = Math.ceil(filteredBusinesses.length / pageSize) || 1;
-      if (currentPage > totalPages) currentPage = totalPages;
-
-      var startIndex = (currentPage - 1) * pageSize;
-      var endIndex = Math.min(startIndex + pageSize, filteredBusinesses.length);
-      var currentItems = filteredBusinesses.slice(startIndex, endIndex);
-
-      currentItems.forEach(function(item) {
+      pageItems.forEach(function(item) {
         var card = document.createElement('div');
         card.className = 'business-card';
-        
-        var categoryText = item.category || 'Animal Service';
-        var locationText = item.location ? '📍 ' + item.location : 'Somerset';
+
+        var category = item.category || 'General';
+        var name = item.name || 'Unnamed Business';
+        var location = item.location || 'Somerset';
 
         card.innerHTML = 
           '<div>' +
-            '<div class="card-category">' + escapeHtml(categoryText) + '</div>' +
-            '<h3 class="card-title">' + escapeHtml(item.name || 'Unnamed Business') + '</h3>' +
-            '<div class="card-location">' + escapeHtml(locationText) + '</div>' +
+            '<div class="card-category">' + escapeHtml(category) + '</div>' +
+            '<div class="card-title">' + escapeHtml(name) + '</div>' +
+            '<div class="card-location">📍 ' + escapeHtml(location) + '</div>' +
           '</div>' +
           '<button class="card-btn" type="button">View Details</button>';
 
@@ -1229,11 +1233,11 @@
         directoryGrid.appendChild(card);
       });
 
-      if (filteredBusinesses.length > pageSize) {
+      if (totalPages > 1) {
         pagination.style.display = 'flex';
         pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
-        prevBtn.disabled = (currentPage === 1);
-        nextBtn.disabled = (currentPage === totalPages);
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
       } else {
         pagination.style.display = 'none';
       }
@@ -1241,34 +1245,22 @@
 
     function openModal(item) {
       document.getElementById('modalCategory').textContent = item.category || 'Animal Service';
-      document.getElementById('modalBusinessName').textContent = item.name || 'Unnamed Business';
-      document.getElementById('modalLocation').textContent = item.location ? '📍 ' + item.location : 'Somerset';
+      document.getElementById('modalBusinessName').textContent = item.name || 'Business Details';
+      document.getElementById('modalLocation').textContent = item.location ? '📍 ' + item.location : '';
 
       var detailsContainer = document.getElementById('modalDetails');
       detailsContainer.innerHTML = '';
 
       if (item.description) {
-        detailsContainer.appendChild(createDetailItem('About', item.description));
+        detailsContainer.appendChild(createDetailItem('Description', item.description));
       }
 
       if (item.phone) {
         var phoneDiv = document.createElement('div');
         phoneDiv.className = 'detail-item';
-        phoneDiv.innerHTML = '<strong>Phone / Contact</strong>' +
+        phoneDiv.innerHTML = '<strong>Phone</strong>' +
           '<a class="phone-link" href="tel:' + escapeHtml(item.phone) + '">📞 ' + escapeHtml(item.phone) + '</a>';
         detailsContainer.appendChild(phoneDiv);
-      }
-
-      if (item.website) {
-        var url = item.website;
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          url = 'https://' + url;
-        }
-        var webDiv = document.createElement('div');
-        webDiv.className = 'detail-item';
-        webDiv.innerHTML = '<strong>Website</strong>' +
-          '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">' + escapeHtml(item.website) + ' ↗</a>';
-        detailsContainer.appendChild(webDiv);
       }
 
       if (item.email) {
@@ -1277,6 +1269,15 @@
         emailDiv.innerHTML = '<strong>Email</strong>' +
           '<a href="mailto:' + escapeHtml(item.email) + '">' + escapeHtml(item.email) + '</a>';
         detailsContainer.appendChild(emailDiv);
+      }
+
+      if (item.website) {
+        var webUrl = item.website.startsWith('http') ? item.website : 'https://' + item.website;
+        var webDiv = document.createElement('div');
+        webDiv.className = 'detail-item';
+        webDiv.innerHTML = '<strong>Website</strong>' +
+          '<a href="' + escapeHtml(webUrl) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(item.website) + '</a>';
+        detailsContainer.appendChild(webDiv);
       }
 
       if (item.address) {
@@ -1297,32 +1298,8 @@
     function createDetailItem(label, text) {
       var div = document.createElement('div');
       div.className = 'detail-item';
-      div.innerHTML = '<strong>' + escapeHtml(label) + '</strong><div>' + escapeHtml(text) + '</div>';
+      div.innerHTML = '<strong>' + escapeHtml(label) + '</strong><p>' + escapeHtml(text) + '</p>';
       return div;
-    }
-
-    function showDirectory() {
-      loadingState.style.display = 'none';
-      errorState.style.display = 'none';
-      emptyState.style.display = 'none';
-      directoryGrid.style.display = 'grid';
-    }
-
-    function showEmpty() {
-      loadingState.style.display = 'none';
-      errorState.style.display = 'none';
-      directoryGrid.style.display = 'none';
-      pagination.style.display = 'none';
-      emptyState.style.display = 'block';
-    }
-
-    function showError(msg) {
-      loadingState.style.display = 'none';
-      directoryGrid.style.display = 'none';
-      emptyState.style.display = 'none';
-      pagination.style.display = 'none';
-      errorMessage.textContent = msg || 'Please refresh or try again shortly.';
-      errorState.style.display = 'block';
     }
 
     function escapeHtml(str) {
