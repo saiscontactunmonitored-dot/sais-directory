@@ -294,7 +294,6 @@
     }
 
     function populateDropdowns(items) {
-      // Clear existing options except default first
       categoryFilter.innerHTML = '<option value="">All Categories</option>';
       locationFilter.innerHTML = '<option value="">All Locations</option>';
 
@@ -305,7 +304,6 @@
         if (i.location) locs.add(i.location);
       });
 
-      // Sort alphabetically for clean display
       Array.from(cats).sort().forEach(function(c) {
         var opt = document.createElement('option'); opt.value = c; opt.textContent = c; categoryFilter.appendChild(opt);
       });
