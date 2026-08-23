@@ -1044,6 +1044,22 @@
       .pagination-container { flex-direction: column; gap: 10px; }
       .pagination-btn { width: 100%; }
     }
+
+    /* HEADER LOGO IMAGE */
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 101;
+    }
+
+    .logo-image {
+      height: 40px;
+      width: 40px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -1051,9 +1067,12 @@
   <div id="menuOverlay" class="menu-overlay"></div>
 
   <header>
-    <div class="logo">
-      Somerset Animal Business Directory
-      <span class="logo-small">Somerset Animal Information Services</span>
+    <div class="logo-wrap">
+      <img class="logo-image" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlyQgt08wIWRqzD0f9yJ35yXvF9ZAG3Q_WOGF10G7AvHDcuZcm6n7AtvMHTOf64S2KEara1NIsfmx66spupcI-wiyFpXyQBzEW5lcdUqKKOsPRAbKZX2Sv0ti_6CLdhyBGCdxFmv33jEIks=s1360-w1360-h1020-rw" alt="Somerset Animal Information Services logo">
+      <div class="logo">
+        Somerset Animal Business Directory
+        <span class="logo-small">Somerset Animal Information Services</span>
+      </div>
     </div>
 
     <button id="hamburgerBtn" class="hamburger-toggle" type="button" aria-label="Toggle Navigation Menu">
