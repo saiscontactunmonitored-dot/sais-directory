@@ -1382,8 +1382,8 @@
     function getDescription(b) { return getVal(b, ['Description', 'Services', 'About', 'Notes', 'Details']); }
 
     async function fetchDirectoryData() {
-      var cacheKey = 'sais_directory_cache_v1';
-      var cachedTimeKey = 'sais_directory_time_v1';
+      var cacheKey = 'sais_directory_cache_v2';
+      var cachedTimeKey = 'sais_directory_time_v2';
       var cachedData = localStorage.getItem(cacheKey);
       var cachedTime = localStorage.getItem(cachedTimeKey);
       var now = new Date().getTime();
