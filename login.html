@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Portal | Somerset Animal Information Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1b263b;
+            --primary-hover: #111827;
+            --accent: #d32f2f;
+            --accent-hover: #b71c1c;
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 12px;
+            --radius-lg: 24px;
+            --shadow-subtle: 0 20px 40px -15px rgba(27, 38, 59, 0.1), 0 0 30px rgba(211, 47, 47, 0.08);
+            --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(rgba(27, 38, 59, 0.7), rgba(27, 38, 59, 0.8)), url('https://images.unsplash.com/photo-1548767797-d8c844163c4c?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-main);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page-wrapper {
+            display: flex;
+            flex-direction: row;
+            gap: 28px;
+            width: 100%;
+            max-width: 1040px;
+            align-items: stretch;
+            box-sizing: border-box;
+        }
+
+        /* Modernized Side Instructions Panel */
+        .instructions-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            padding: 36px 32px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-subtle);
+            flex: 0 0 360px;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .instructions-panel h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .step-list li {
+            position: relative;
+            padding-left: 36px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .step-list li::before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            top: -1px;
+            width: 24px;
+            height: 24px;
+            background: #f1f5f9;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 11px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .step-list li strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .support-box {
+            margin-top: 24px;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .support-box a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .support-box a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Container */
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-subtle);
+            flex: 1;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .portal-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .portal-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0 0 6px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .portal-header p {
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 700;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--text-main);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            box-sizing: border-box;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text-main);
+            background-color: #f8fafc;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            height: 90px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            margin-top: 6px;
+            transition: var(--transition);
+            box-shadow: 0 4px 14px rgba(211, 47, 47, 0.3);
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(211, 47, 47, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .secondary-btn {
+            background-color: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            margin-top: 8px;
+            box-shadow: none;
+        }
+
+        .secondary-btn:hover {
+            background-color: #f1f5f9;
+            color: var(--primary);
+            border-color: #cbd5e1;
+            box-shadow: none;
+        }
+
+        .danger-btn {
+            background-color: #fef2f2;
+            color: var(--accent);
+            border: 1px solid #fee2e2;
+            margin-top: 12px;
+            box-shadow: none;
+        }
+
+        .danger-btn:hover {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.25);
+        }
+
+        .message {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .nav-links {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .nav-links p {
+            margin: 6px 0;
+            color: var(--text-muted);
+        }
+
+        .nav-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .back-home {
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .back-home a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 12px;
+            transition: var(--transition);
+        }
+
+        .back-home a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .policy-links {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+
+        .policy-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 6px;
+            transition: var(--transition);
+        }
+
+        .policy-links a:hover {
+            color: var(--primary);
+        }
+
+        #welcomeUser {
+            font-size: 12px;
+            background-color: #f1f5f9;
+            color: var(--primary);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 860px) {
+            .page-wrapper {
+                flex-direction: column;
+            }
+            .instructions-panel {
+                flex: none;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <!-- STEP-BY-STEP INSTRUCTIONS PANEL (STAYS VISIBLE ACROSS ALL VIEWS) -->
+    <div class="instructions-panel">
+        <div>
+            <h3>How to Use the Portal</h3>
+            <ul class="step-list">
+                <li data-step="1">
+                    <strong>Select Your Action</strong>
+                    Log in with your existing account, claim your current listing, or list a new business free of charge.
+                </li>
+                <li data-step="2">
+                    <strong>Authenticate Securely</strong>
+                    Use your registered business email and secure password to open your management dashboard.
+                </li>
+                <li data-step="3">
+                    <strong>Manage & Update</strong>
+                    Keep your hours, contact details, web links, social channels, and service descriptions current.
+                </li>
+                <li data-step="4">
+                    <strong>Instant Directory Sync</strong>
+                    All saved modifications update instantly across the live Somerset animal directory records.
+                </li>
+            </ul>
+        </div>
+        <div class="support-box">
+            Encountering any issues?<br>
+            <a href="mailto:info@somersetanimalinformationservices.com">info@somersetanimalinformationservices.com</a>
+        </div>
+    </div>
+
+    <!-- MAIN PORTAL CONTAINER -->
+    <div class="container">
+
+        <div class="portal-header">
+            <h1>Somerset Animal Business Directory</h1>
+            <p>Somerset Animal Information Services</p>
+        </div>
+
+        <!-- LOGIN VIEW -->
+        <div id="loginView">
+            <h2>Business Portal Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" required placeholder="name@business.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <button type="submit" id="loginBtn">Log In</button>
+                <div class="message" id="loginMessage"></div>
+            </form>
+            <div class="nav-links">
+                <p>Need a business account? <a id="showRegisterLink">Register or Claim Listing</a></p>
+                <p><a id="showForgotLink">Forgot Password?</a></p>
+            </div>
+            <div class="back-home">
+                <a href="index.html" target="_top">&larr; Back to Homepage</a>
+            </div>
+        </div>
+
+        <!-- REGISTER VIEW -->
+        <div id="registerView" class="hidden">
+            <h2>Business Registration</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="regTypeSelect">Registration Type</label>
+                    <select id="regTypeSelect">
+                        <option value="claim">Claim an existing listing in the directory</option>
+                        <option value="new">Add a brand-new business to the directory</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="regEmail">Email Address</label>
+                    <input type="email" id="regEmail" required placeholder="name@business.com">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Create Password (Min 6 characters)</label>
+                    <input type="password" id="regPassword" required placeholder="Choose a secure password">
+                </div>
+                <div class="form-group">
+                    <label for="regPhone">Phone Number</label>
+                    <input type="tel" id="regPhone" placeholder="01234 567890">
+                </div>
+
+                <div id="claimFields" class="form-group">
+                    <label for="regBusinessSearch">Business Name or ID (from directory)</label>
+                    <input type="text" id="regBusinessSearch" placeholder="e.g., Somerset Pet Business or SAIS-1" required>
+                </div>
+
+                <div id="newFields" class="form-group hidden">
+                    <label for="regNewBusinessName">Business Name</label>
+                    <input type="text" id="regNewBusinessName" placeholder="Enter your business name">
+
+                    <label for="regNewCategory" style="margin-top: 12px;">Category</label>
+                    <input type="text" id="regNewCategory" placeholder="e.g., Dog Grooming, Veterinary">
+
+                    <label for="regNewTown" style="margin-top: 12px;">Area / Town</label>
+                    <input type="text" id="regNewTown" placeholder="e.g., Taunton, Somerset">
+
+                    <label for="regNewAddress" style="margin-top: 12px;">Address</label>
+                    <input type="text" id="regNewAddress" placeholder="Street address or location">
+
+                    <label for="regNewPhone" style="margin-top: 12px;">Phone</label>
+                    <input type="tel" id="regNewPhone" placeholder="Contact phone number">
+
+                    <label for="regNewEmail" style="margin-top: 12px;">Email</label>
+                    <input type="email" id="regNewEmail" placeholder="Business public email">
+
+                    <label for="regNewWebsite" style="margin-top: 12px;">Website</label>
+                    <input type="url" id="regNewWebsite" placeholder="https://www.yourbusiness.com">
+
+                    <label for="regNewFacebook" style="margin-top: 12px;">Facebook</label>
+                    <input type="url" id="regNewFacebook" placeholder="Facebook page URL">
+
+                    <label for="regNewInstagram" style="margin-top: 12px;">Instagram</label>
+                    <input type="url" id="regNewInstagram" placeholder="Instagram profile URL">
+
+                    <label for="regNewDescription" style="margin-top: 12px;">Description</label>
+                    <textarea id="regNewDescription" placeholder="Tell us about your services..."></textarea>
+                </div>
+
+                <button type="submit" id="regBtn">Submit Free Registration</button>
+                <div class="message" id="regMessage"></div>
+            </form>
+            <div class="nav-links">
+                <p>Already registered? <a id="showLoginLink">Back to Login</a></p>
+            </div>
+            <div class="back-home">
+                <a href="index.html" target="_top">&larr; Back to Homepage</a>
+            </div>
+        </div>
+
+        <!-- FORGOT PASSWORD VIEW -->
+        <div id="forgotView" class="hidden">
+            <h2>Reset Password</h2>
+            <form id="forgotForm">
+                <div class="form-group">
+                    <label for="forgotEmail">Registered Email Address</label>
+                    <input type="email" id="forgotEmail" required placeholder="name@business.com">
+                </div>
+                <button type="submit" id="forgotBtn">Send Reset Instructions</button>
+                <div class="message" id="forgotMessage"></div>
+            </form>
+            <div class="nav-links">
+                <p><a id="backToLoginFromForgot">Back to Login</a></p>
+            </div>
+            <div class="back-home">
+                <a href="index.html" target="_top">&larr; Back to Homepage</a>
+            </div>
+        </div>
+
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboardView" class="hidden">
+            <h2>Manage Business Details</h2>
+            <p id="welcomeUser"></p>
+            
+            <form id="dashboardForm">
+                <div id="dynamicFieldsContainer"></div>
+                <button type="submit" id="updateBizBtn">Save Changes</button>
+                <div class="message" id="dashboardMessage"></div>
+            </form>
+
+            <button type="button" id="logoutBtn" class="secondary-btn">Log Out</button>
+            <button type="button" id="deactivateBtn" class="danger-btn" onclick="requestDeactivation()">Request Listing Removal / Deactivation</button>
+            
+            <div class="back-home">
+                <a href="index.html" target="_top">&larr; Back to Homepage</a>
+            </div>
+        </div>
+
+        <div class="policy-links">
+            <a href="privacy.html" target="_blank">Privacy Policy</a> | 
+            <a href="terms.html" target="_blank">Terms of Service</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwl2XzI0HGvzVj5cXSPuZmTQ-8fB9w328OZ5IsMEp-eRLr-Qr_2mbD81tCKZrt1Uxoa/exec";
+
+    let currentUser = null;
+    let currentBusiness = null;
+
+    const ALLOWED_FIELDS = [
+        "Business Name",
+        "Category",
+        "Area / Town",
+        "Address",
+        "Phone",
+        "Email",
+        "Website",
+        "Facebook",
+        "Instagram",
+        "Description"
+    ];
+
+    function showView(viewId) {
+        ['loginView', 'registerView', 'forgotView', 'dashboardView'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    document.getElementById('showRegisterLink').addEventListener('click', () => showView('registerView'));
+    document.getElementById('showLoginLink').addEventListener('click', () => showView('loginView'));
+    document.getElementById('showForgotLink').addEventListener('click', () => showView('forgotView'));
+    document.getElementById('backToLoginFromForgot').addEventListener('click', () => showView('loginView'));
+
+    document.getElementById('regTypeSelect').addEventListener('change', function() {
+        const val = this.value;
+        if (val === 'claim') {
+            document.getElementById('claimFields').classList.remove('hidden');
+            document.getElementById('newFields').classList.add('hidden');
+            document.getElementById('regBusinessSearch').required = true;
+            document.getElementById('regNewBusinessName').required = false;
+        } else {
+            document.getElementById('claimFields').classList.add('hidden');
+            document.getElementById('newFields').classList.remove('hidden');
+            document.getElementById('regBusinessSearch').required = false;
+            document.getElementById('regNewBusinessName').required = true;
+        }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        const msg = document.getElementById('loginMessage');
+        const btn = document.getElementById('loginBtn');
+
+        btn.disabled = true;
+        btn.textContent = 'Logging in...';
+        msg.style.color = '#64748b';
+        msg.textContent = 'Verifying credentials...';
+
+        try {
+            const url = `${WEB_APP_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                currentUser = result.user;
+                currentBusiness = result.business;
+                loadDashboardData();
+                showView('dashboardView');
+            } else if (result.status === 'pending') {
+                msg.style.color = '#d97706';
+                msg.textContent = result.message;
+            } else {
+                msg.style.color = '#d32f2f';
+                msg.textContent = result.message;
+            }
+        } catch (error) {
+            msg.style.color = '#d32f2f';
+            msg.textContent = 'Connection error: ' + error.message;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Log In';
+        }
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const regType = document.getElementById('regTypeSelect').value;
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
+        
+        const msg = document.getElementById('regMessage');
+        const btn = document.getElementById('regBtn');
+
+        if (password.length < 6) {
+            msg.style.color = '#d32f2f';
+            msg.textContent = 'Password must be at least 6 characters.';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+        msg.style.color = '#64748b';
+        msg.textContent = 'Processing registration...';
+
+        try {
+            let url = `${WEB_APP_URL}?action=register&regType=${regType}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&phone=${encodeURIComponent(phone)}`;
+            
+            if (regType === 'claim') {
+                const businessInput = document.getElementById('regBusinessSearch').value.trim();
+                url += `&businessId=${encodeURIComponent(businessInput)}&businessName=${encodeURIComponent(businessInput)}`;
+            } else {
+                url += `&businessName=${encodeURIComponent(document.getElementById('regNewBusinessName').value.trim())}` +
+                       `&Category=${encodeURIComponent(document.getElementById('regNewCategory').value.trim())}` +
+                       `&Town=${encodeURIComponent(document.getElementById('regNewTown').value.trim())}` +
+                       `&Address=${encodeURIComponent(document.getElementById('regNewAddress').value.trim())}` +
+                       `&Phone=${encodeURIComponent(document.getElementById('regNewPhone').value.trim())}` +
+                       `&Email=${encodeURIComponent(document.getElementById('regNewEmail').value.trim())}` +
+                       `&Website=${encodeURIComponent(document.getElementById('regNewWebsite').value.trim())}` +
+                       `&Facebook=${encodeURIComponent(document.getElementById('regNewFacebook').value.trim())}` +
+                       `&Instagram=${encodeURIComponent(document.getElementById('regNewInstagram').value.trim())}` +
+                       `&Description=${encodeURIComponent(document.getElementById('regNewDescription').value.trim())}`;
+            }
+
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.status === 'success' || result.status === 'exists') {
+                msg.style.color = '#16a34a';
+                msg.textContent = result.message;
+                document.getElementById('signupForm').reset();
+            } else {
+                msg.style.color = '#d32f2f';
+                msg.textContent = result.message;
+            }
+        } catch (error) {
+            msg.style.color = '#d32f2f';
+            msg.textContent = 'Error: ' + error.message;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Submit Free Registration';
+        }
+    });
+
+    document.getElementById('forgotForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('forgotEmail').value.trim();
+        const msg = document.getElementById('forgotMessage');
+        const btn = document.getElementById('forgotBtn');
+
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+
+        try {
+            const url = `${WEB_APP_URL}?action=requestPasswordReset&email=${encodeURIComponent(email)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+            msg.style.color = '#16a34a';
+            msg.textContent = result.message;
+        } catch (error) {
+            msg.style.color = '#d32f2f';
+            msg.textContent = 'Error sending reset code.';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Send Reset Instructions';
+        }
+    });
+
+    function loadDashboardData() {
+        document.getElementById('welcomeUser').textContent = `Logged in as: ${currentUser.email} (ID: ${currentUser.businessId})`;
+        const container = document.getElementById('dynamicFieldsContainer');
+        container.innerHTML = '';
+
+        if (!currentBusiness) {
+            container.innerHTML = '<p style="color: #d32f2f; text-align: center;">No linked business record found.</p>';
+            return;
+        }
+
+        const idGroup = document.createElement('div');
+        idGroup.className = 'form-group';
+        const idLabel = document.createElement('label');
+        idLabel.textContent = 'Business ID';
+        const idInput = document.createElement('input');
+        idInput.type = 'text';
+        idInput.value = currentBusiness['Business ID'] || currentUser.businessId;
+        idInput.disabled = true;
+        idGroup.appendChild(idLabel);
+        idGroup.appendChild(idInput);
+        container.appendChild(idGroup);
+
+        ALLOWED_FIELDS.forEach(fieldKey => {
+            const group = document.createElement('div');
+            group.className = 'form-group';
+
+            const label = document.createElement('label');
+            label.textContent = fieldKey;
+            group.appendChild(label);
+
+            if (fieldKey.toLowerCase().includes('description')) {
+                const textarea = document.createElement('textarea');
+                textarea.name = fieldKey;
+                textarea.value = currentBusiness[fieldKey] || '';
+                group.appendChild(textarea);
+            } else {
+                const input = document.createElement('input');
+                input.type = fieldKey.toLowerCase().includes('email') ? 'email' : (fieldKey.toLowerCase().includes('website') || fieldKey.toLowerCase().includes('facebook') || fieldKey.toLowerCase().includes('instagram') ? 'url' : 'text');
+                input.name = fieldKey;
+                input.value = currentBusiness[fieldKey] === undefined ? '' : currentBusiness[fieldKey];
+                group.appendChild(input);
+            }
+            container.appendChild(group);
+        });
+    }
+
+    document.getElementById('dashboardForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const inputs = document.querySelectorAll('#dynamicFieldsContainer input, #dynamicFieldsContainer textarea');
+        const updatedData = {};
+        
+        inputs.forEach(input => {
+            if (input.name && ALLOWED_FIELDS.includes(input.name)) {
+                updatedData[input.name] = input.value;
+            }
+        });
+
+        const msg = document.getElementById('dashboardMessage');
+        const btn = document.getElementById('updateBizBtn');
+
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        try {
+            const url = `${WEB_APP_URL}?action=updateBusiness&businessId=${encodeURIComponent(currentUser.businessId)}&businessData=${encodeURIComponent(JSON.stringify(updatedData))}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                msg.style.color = '#16a34a';
+                msg.textContent = result.message;
+            } else {
+                msg.style.color = '#d32f2f';
+                msg.textContent = result.message;
+            }
+        } catch (error) {
+            msg.style.color = '#d32f2f';
+            msg.textContent = 'Error updating record.';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Save Changes';
+        }
+    });
+
+    async function requestDeactivation() {
+        if (!confirm("Are you sure you want to request deactivation or removal of your directory listing? This will notify site administration.")) {
+            return;
+        }
+
+        const bizName = currentBusiness ? (currentBusiness['Business Name'] || 'Unknown') : 'Unknown';
+        const bizId = currentUser ? currentUser.businessId : 'Unknown';
+        const userEmail = currentUser ? currentUser.email : '';
+
+        try {
+            const url = `${WEB_APP_URL}?action=requestDeactivation&businessId=${encodeURIComponent(bizId)}&businessName=${encodeURIComponent(bizName)}&email=${encodeURIComponent(userEmail)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                alert("Deactivation request successfully sent to support team.");
+            } else {
+                alert("Failed to send request: " + result.message);
+            }
+        } catch (error) {
+            alert("Connection error while requesting deactivation.");
+        }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        currentUser = null;
+        currentBusiness = null;
+        document.getElementById('loginForm').reset();
+        showView('loginView');
+    });
+</script>
+
+</body>
+</html>
