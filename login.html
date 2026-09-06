@@ -21,6 +21,7 @@
         .nav-links a:hover { text-decoration: underline; }
         .home-btn { position: absolute; top: 15px; left: 20px; font-size: 13px; color: #666; text-decoration: none; font-weight: bold; }
         .home-btn:hover { color: #2c3e50; }
+        .section-box { margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -28,7 +29,6 @@
 <div class="card">
     <a href="index.html" class="home-btn">&larr; Back to Home</a>
 
-    <!-- LOGIN VIEW -->
     <div id="loginView">
         <h2 style="margin-top: 20px;">Business Portal Login</h2>
         <form id="loginForm">
@@ -48,7 +48,6 @@
         </div>
     </div>
 
-    <!-- REGISTER VIEW -->
     <div id="registerView" class="hidden">
         <h2 style="margin-top: 20px;">Request Business Access</h2>
         <form id="signupForm">
@@ -76,23 +75,36 @@
         </div>
     </div>
 
-    <!-- DASHBOARD VIEW -->
     <div id="dashboardView" class="hidden">
         <h2 style="margin-top: 20px;">Edit Your Business Listing</h2>
         <p id="welcomeUser" style="text-align: center; color: #666; font-size: 13px; margin-bottom: 20px;"></p>
+        
         <form id="editForm">
             <div id="dynamicFields"></div>
             <button type="submit" id="saveBtn">Save Changes</button>
             <div class="message" id="editMessage"></div>
         </form>
-        <div class="nav-links">
+
+        <div class="section-box">
+            <h3>Change Password</h3>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" required placeholder="Enter new password">
+                </div>
+                <button type="submit" id="passwordBtn" style="background: #e67e22;">Update Password</button>
+                <div class="message" id="passwordMessage"></div>
+            </form>
+        </div>
+
+        <div class="nav-links" style="margin-top: 20px;">
             <a id="logoutLink">Log Out</a> | <a href="index.html">Return to Home</a>
         </div>
     </div>
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxf8z7doYQXXlwt6kU9pu4Pwsob1uAQ66nPaMUDfuu2xz_6SoRi13IE1MB-0k_GnU-D/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzIExXgIAcuPoyfssLwfp8jP-DGoPKYXZpj8clWhgggtF4GcFdEPFddFyTkgp7XgmAk/exec";
 
     document.getElementById('showRegisterLink').addEventListener('click', () => {
         document.getElementById('loginView').classList.add('hidden');
@@ -182,12 +194,14 @@
     });
 
     let currentBusinessId = '';
+    let currentUserEmail = '';
 
     function loadDashboard(user, business) {
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('dashboardView').classList.remove('hidden');
         document.getElementById('welcomeUser').textContent = `Logged in as: ${user.email} (Business ID: ${user.businessId})`;
         currentBusinessId = user.businessId;
+        currentUserEmail = user.email;
 
         const container = document.getElementById('dynamicFields');
         container.innerHTML = '';
@@ -281,6 +295,40 @@
         } finally {
             btn.disabled = false;
             btn.textContent = 'Save Changes';
+        }
+    });
+
+    // 4. UPDATE PASSWORD SUBMISSION
+    document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const newPassword = document.getElementById('newPassword').value.trim();
+        const msg = document.getElementById('passwordMessage');
+        const btn = document.getElementById('passwordBtn');
+
+        btn.disabled = true;
+        btn.textContent = 'Updating...';
+        msg.style.color = '#555';
+        msg.textContent = 'Saving password...';
+
+        try {
+            const url = `${WEB_APP_URL}?action=updatePassword&email=${encodeURIComponent(currentUserEmail)}&newPassword=${encodeURIComponent(newPassword)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                msg.style.color = 'green';
+                msg.textContent = 'Password updated successfully!';
+                document.getElementById('passwordForm').reset();
+            } else {
+                msg.style.color = '#e74c3c';
+                msg.textContent = 'Error: ' + result.message;
+            }
+        } catch (error) {
+            msg.style.color = '#e74c3c';
+            msg.textContent = 'Update failed: ' + error.message;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Update Password';
         }
     });
 </script>
