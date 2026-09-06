@@ -136,7 +136,7 @@
         }
     });
 
-    // 2. LOGIN & STATUS CHECK (Using GET for local testing compatibility)
+    // 2. LOGIN & STATUS CHECK (With Debug Logging)
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value.trim();
@@ -151,6 +151,9 @@
         try {
             const response = await fetch(`${WEB_APP_URL}?action=login&email=${encodeURIComponent(email)}`);
             const result = await response.json();
+            
+            // PRINT TO BROWSER CONSOLE FOR DEBUGGING
+            console.log("Server Response:", result);
 
             if (result.status === 'success') {
                 loadDashboard(result.user, result.business);
@@ -162,6 +165,7 @@
                 msg.textContent = result.message;
             }
         } catch (error) {
+            console.error("Fetch Error:", error);
             msg.style.color = '#e74c3c';
             msg.textContent = 'Connection error. Please try again.';
         } finally {
