@@ -9,19 +9,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1b4d3e;
-            --primary-hover: #13382c;
-            --accent: #e0a96d;
-            --bg-color: #f7f9f6;
+            /* Matched directly to your site branding (Dark Navy/Slate Header & Red Accent) */
+            --primary: #1e293b;
+            --primary-hover: #0f172a;
+            --accent: #dc2626;
+            --accent-hover: #b91c1c;
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #2c3e35;
-            --text-muted: #62756a;
-            --border-color: #e2e8e3;
-            --danger: #d9534f;
-            --danger-hover: #c9302c;
-            --radius-sm: 8px;
-            --radius-lg: 16px;
-            --shadow-subtle: 0 10px 30px -5px rgba(27, 77, 62, 0.06), 0 4px 6px -2px rgba(27, 77, 62, 0.03);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 10px;
+            --radius-lg: 20px;
+            --shadow-subtle: 0 20px 25px -5px rgba(30, 41, 59, 0.05), 0 8px 10px -6px rgba(30, 41, 59, 0.05);
             --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -55,20 +55,20 @@
         }
 
         .portal-header h1 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--primary);
-            margin: 0 0 8px 0;
+            margin: 0 0 6px 0;
             letter-spacing: -0.01em;
         }
 
         .portal-header p {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 600;
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 700;
             margin: 0;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
         }
 
         h2 {
@@ -101,7 +101,7 @@
             font-size: 14px;
             font-family: inherit;
             color: var(--text-main);
-            background-color: #fafbfc;
+            background-color: #f8fafc;
             transition: var(--transition);
         }
 
@@ -109,7 +109,7 @@
             outline: none;
             border-color: var(--primary);
             background-color: #ffffff;
-            box-shadow: 0 0 0 4px rgba(27, 77, 62, 0.08);
+            box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.08);
         }
 
         textarea {
@@ -120,7 +120,7 @@
         button {
             width: 100%;
             padding: 14px;
-            background-color: var(--primary);
+            background-color: var(--accent);
             color: white;
             border: none;
             border-radius: var(--radius-sm);
@@ -130,11 +130,11 @@
             font-family: inherit;
             margin-top: 8px;
             transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(27, 77, 62, 0.15);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
         }
 
         button:hover {
-            background-color: var(--primary-hover);
+            background-color: var(--accent-hover);
             transform: translateY(-1px);
         }
 
@@ -143,7 +143,7 @@
         }
 
         button:disabled {
-            background-color: #b5c2bc;
+            background-color: #cbd5e1;
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
@@ -158,22 +158,23 @@
         }
 
         .secondary-btn:hover {
-            background-color: #f2f5f3;
+            background-color: #f1f5f9;
             color: var(--primary);
+            border-color: #cbd5e1;
         }
 
         .danger-btn {
-            background-color: #fff5f5;
-            color: var(--danger);
-            border: 1px solid #fde8e8;
+            background-color: #fef2f2;
+            color: var(--accent);
+            border: 1px solid #fee2e2;
             margin-top: 16px;
             box-shadow: none;
         }
 
         .danger-btn:hover {
-            background-color: var(--danger);
+            background-color: var(--accent);
             color: white;
-            border-color: var(--danger);
+            border-color: var(--accent);
         }
 
         .message {
@@ -231,9 +232,9 @@
 
         #welcomeUser {
             font-size: 13px;
-            background-color: #f2f7f4;
+            background-color: #f1f5f9;
             color: var(--primary);
-            padding: 10px 14px;
+            padding: 12px 16px;
             border-radius: var(--radius-sm);
             text-align: center;
             margin-bottom: 24px;
@@ -245,10 +246,10 @@
 
 <div class="container">
 
-    <!-- PROMINENT HEADER -->
+    <!-- PROMINENT HEADER MATCHING YOUR SITE -->
     <div class="portal-header">
         <h1>Somerset Animal Business Directory</h1>
-        <p>Secure Portal & Management</p>
+        <p>Somerset Animal Information Services</p>
     </div>
 
     <!-- LOGIN VIEW -->
@@ -438,7 +439,7 @@
 
         btn.disabled = true;
         btn.textContent = 'Logging in...';
-        msg.style.color = '#62756a';
+        msg.style.color = '#64748b';
         msg.textContent = 'Verifying credentials...';
 
         try {
@@ -455,11 +456,11 @@
                 msg.style.color = '#d97706';
                 msg.textContent = result.message;
             } else {
-                msg.style.color = '#d9534f';
+                msg.style.color = '#dc2626';
                 msg.textContent = result.message;
             }
         } catch (error) {
-            msg.style.color = '#d9534f';
+            msg.style.color = '#dc2626';
             msg.textContent = 'Connection error: ' + error.message;
         } finally {
             btn.disabled = false;
@@ -478,14 +479,14 @@
         const btn = document.getElementById('regBtn');
 
         if (password.length < 6) {
-            msg.style.color = '#d9534f';
+            msg.style.color = '#dc2626';
             msg.textContent = 'Password must be at least 6 characters.';
             return;
         }
 
         btn.disabled = true;
         btn.textContent = 'Submitting...';
-        msg.style.color = '#62756a';
+        msg.style.color = '#64748b';
         msg.textContent = 'Processing registration...';
 
         try {
@@ -511,15 +512,15 @@
             const result = await response.json();
 
             if (result.status === 'success' || result.status === 'exists') {
-                msg.style.color = '#1b4d3e';
+                msg.style.color = '#16a34a';
                 msg.textContent = result.message;
                 document.getElementById('signupForm').reset();
             } else {
-                msg.style.color = '#d9534f';
+                msg.style.color = '#dc2626';
                 msg.textContent = result.message;
             }
         } catch (error) {
-            msg.style.color = '#d9534f';
+            msg.style.color = '#dc2626';
             msg.textContent = 'Error: ' + error.message;
         } finally {
             btn.disabled = false;
@@ -540,10 +541,10 @@
             const url = `${WEB_APP_URL}?action=requestPasswordReset&email=${encodeURIComponent(email)}`;
             const response = await fetch(url);
             const result = await response.json();
-            msg.style.color = '#1b4d3e';
+            msg.style.color = '#16a34a';
             msg.textContent = result.message;
         } catch (error) {
-            msg.style.color = '#d9534f';
+            msg.style.color = '#dc2626';
             msg.textContent = 'Error sending reset code.';
         } finally {
             btn.disabled = false;
@@ -557,7 +558,7 @@
         container.innerHTML = '';
 
         if (!currentBusiness) {
-            container.innerHTML = '<p style="color: #d9534f; text-align: center;">No linked business record found.</p>';
+            container.innerHTML = '<p style="color: #dc2626; text-align: center;">No linked business record found.</p>';
             return;
         }
 
@@ -592,7 +593,7 @@
                 const input = document.createElement('input');
                 input.type = fieldKey.toLowerCase().includes('email') ? 'email' : (fieldKey.toLowerCase().includes('website') || fieldKey.toLowerCase().includes('facebook') || fieldKey.toLowerCase().includes('instagram') ? 'url' : 'text');
                 input.name = fieldKey;
-                input.value = currentBusiness[fieldKey] || '';
+                input.value = currentBusiness[fieldKey] === undefined ? '' : currentBusiness[fieldKey];
                 group.appendChild(input);
             }
             container.appendChild(group);
@@ -622,14 +623,14 @@
             const result = await response.json();
 
             if (result.status === 'success') {
-                msg.style.color = '#1b4d3e';
+                msg.style.color = '#16a34a';
                 msg.textContent = result.message;
             } else {
-                msg.style.color = '#d9534f';
+                msg.style.color = '#dc2626';
                 msg.textContent = result.message;
             }
         } catch (error) {
-            msg.style.color = '#d9534f';
+            msg.style.color = '#dc2626';
             msg.textContent = 'Error updating record.';
         } finally {
             btn.disabled = false;
