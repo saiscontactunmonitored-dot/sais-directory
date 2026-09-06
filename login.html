@@ -185,8 +185,22 @@
             return;
         }
 
-        for (let key in business) {
-            if (key === '_sheetRow') continue;
+        const allowedFields = [
+            'Business ID',
+            'Business Name',
+            'Category',
+            'Area / Town',
+            'Phone',
+            'Email',
+            'Website',
+            'Facebook',
+            'Instagram',
+            'Description',
+            'Active'
+        ];
+
+        allowedFields.forEach(key => {
+            if (business[key] === undefined && key !== 'Business ID') return;
 
             const div = document.createElement('div');
             div.className = 'form-group';
@@ -198,16 +212,18 @@
             if (key.toLowerCase().includes('id')) {
                 const input = document.createElement('input');
                 input.type = 'text';
-                input.value = business[key];
+                input.value = business[key] || user.businessId;
                 input.disabled = true;
                 input.style.background = '#e9ecef';
                 div.appendChild(input);
-            } else if (key.toLowerCase().includes('description') || key.toLowerCase().includes('detail')) {
+            } 
+            else if (key.toLowerCase().includes('description')) {
                 const textarea = document.createElement('textarea');
                 textarea.name = key;
                 textarea.value = business[key] || '';
                 div.appendChild(textarea);
-            } else {
+            } 
+            else {
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.name = key;
@@ -215,7 +231,7 @@
                 div.appendChild(input);
             }
             container.appendChild(div);
-        }
+        });
     }
 
     // 3. SUBMIT UPDATES (GET)
