@@ -29,6 +29,7 @@
 <div class="card">
     <a href="index.html" class="home-btn">&larr; Back to Home</a>
 
+    <!-- LOGIN VIEW -->
     <div id="loginView">
         <h2 style="margin-top: 20px;">Business Portal Login</h2>
         <form id="loginForm">
@@ -48,6 +49,7 @@
         </div>
     </div>
 
+    <!-- REGISTER VIEW -->
     <div id="registerView" class="hidden">
         <h2 style="margin-top: 20px;">Request Business Access</h2>
         <form id="signupForm">
@@ -75,6 +77,7 @@
         </div>
     </div>
 
+    <!-- DASHBOARD VIEW -->
     <div id="dashboardView" class="hidden">
         <h2 style="margin-top: 20px;">Edit Your Business Listing</h2>
         <p id="welcomeUser" style="text-align: center; color: #666; font-size: 13px; margin-bottom: 20px;"></p>
@@ -85,6 +88,7 @@
             <div class="message" id="editMessage"></div>
         </form>
 
+        <!-- PASSWORD CHANGE SECTION -->
         <div class="section-box">
             <h3>Change Password</h3>
             <form id="passwordForm">
@@ -104,7 +108,7 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzIExXgIAcuPoyfssLwfp8jP-DGoPKYXZpj8clWhgggtF4GcFdEPFddFyTkgp7XgmAk/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwWdU2-9Uulkes2yCUvgnqaVz8g7QaMExDgvfUVWYmiwlLQz-KMVxEOLiYyRWgT_2MQ/exec";
 
     document.getElementById('showRegisterLink').addEventListener('click', () => {
         document.getElementById('loginView').classList.add('hidden');
@@ -115,10 +119,28 @@
         document.getElementById('loginView').classList.remove('hidden');
     });
     document.getElementById('logoutLink').addEventListener('click', () => {
+        clearTimeout(idleTimer);
         document.getElementById('dashboardView').classList.add('hidden');
         document.getElementById('loginView').classList.remove('hidden');
         document.getElementById('loginForm').reset();
     });
+
+    // Idle Timeout (15 minutes = 900,000 ms)
+    let idleTimer;
+    function resetIdleTimer() {
+        if (document.getElementById('dashboardView').classList.contains('hidden')) return;
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => {
+            if (!document.getElementById('dashboardView').classList.contains('hidden')) {
+                document.getElementById('logoutLink').click();
+                alert('You have been logged out due to inactivity.');
+            }
+        }, 900000);
+    }
+
+    window.addEventListener('mousemove', resetIdleTimer);
+    window.addEventListener('keypress', resetIdleTimer);
+    window.addEventListener('click', resetIdleTimer);
 
     // 1. REGISTRATION SUBMISSION
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
@@ -202,6 +224,8 @@
         document.getElementById('welcomeUser').textContent = `Logged in as: ${user.email} (Business ID: ${user.businessId})`;
         currentBusinessId = user.businessId;
         currentUserEmail = user.email;
+
+        resetIdleTimer(); // Start tracking inactivity
 
         const container = document.getElementById('dynamicFields');
         container.innerHTML = '';
