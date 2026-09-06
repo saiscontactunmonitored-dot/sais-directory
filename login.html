@@ -143,13 +143,11 @@
 
 <div class="container">
 
-    <!-- PROMINENT HEADER -->
     <div class="portal-header">
         <h1>Somerset Animal Business Directory Login / Sign Up</h1>
         <p>100% Free Listing & Portal Management</p>
     </div>
 
-    <!-- LOGIN VIEW -->
     <div id="loginView">
         <h2>Business Portal Login</h2>
         <form id="loginForm">
@@ -170,7 +168,6 @@
         </div>
     </div>
 
-    <!-- REGISTER VIEW -->
     <div id="registerView" class="hidden">
         <h2>Business Portal Registration</h2>
         <form id="signupForm">
@@ -195,13 +192,11 @@
                 <input type="tel" id="regPhone" placeholder="01234 567890">
             </div>
 
-            <!-- Claim Dynamic Fields -->
             <div id="claimFields" class="form-group">
                 <label for="regBusinessSearch">Business Name or ID (from directory)</label>
                 <input type="text" id="regBusinessSearch" placeholder="e.g., Somerset Pet Business or SAIS-1" required>
             </div>
 
-            <!-- New Business Dynamic Fields -->
             <div id="newFields" class="form-group hidden">
                 <label for="regNewBusinessName">New Business Name</label>
                 <input type="text" id="regNewBusinessName" placeholder="Enter your business name">
@@ -209,7 +204,7 @@
                 <label for="regNewCategory" style="margin-top: 10px;">Business Category / Services</label>
                 <input type="text" id="regNewCategory" placeholder="e.g., Dog Grooming, Veterinary, Pet Sitting">
 
-                <label for="regNewTown" style="margin-top: 10px;">Town / Area</label>
+                <label for="regNewTown" style="margin-top: 10px;">Area / Town</label>
                 <input type="text" id="regNewTown" placeholder="e.g., Taunton, Somerset">
 
                 <label for="regNewWebsite" style="margin-top: 10px;">Website or Social Media Link</label>
@@ -227,7 +222,6 @@
         </div>
     </div>
 
-    <!-- FORGOT PASSWORD VIEW -->
     <div id="forgotView" class="hidden">
         <h2>Reset Password</h2>
         <form id="forgotForm">
@@ -243,7 +237,6 @@
         </div>
     </div>
 
-    <!-- DASHBOARD VIEW -->
     <div id="dashboardView" class="hidden">
         <h2>Manage Business Details</h2>
         <p id="welcomeUser" style="font-size: 14px; color: #555; text-align: center; margin-bottom: 20px;"></p>
@@ -267,7 +260,7 @@
 
 <script>
     // Live Deployment Endpoint
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxA-jtJcLkKNX-0FGenmutZFSEZ6OE3-4ZEuhMKWeL3l3J2o5__3uYxT6ZqQ3brvao/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzVORZdk4zO2129VX-V_q0tWavYN4JaDRurkuuzbRzL_Y-k9SrE0cExrjIv7QcOt8mo/exec";
 
     let currentUser = null;
     let currentBusiness = null;
