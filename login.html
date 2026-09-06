@@ -136,7 +136,7 @@
         }
     });
 
-    // 2. LOGIN & STATUS CHECK
+    // 2. LOGIN & STATUS CHECK (Using GET for local testing compatibility)
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value.trim();
@@ -149,11 +149,7 @@
         msg.textContent = 'Verifying account...';
 
         try {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'login', email: email })
-            });
+            const response = await fetch(`${WEB_APP_URL}?action=login&email=${encodeURIComponent(email)}`);
             const result = await response.json();
 
             if (result.status === 'success') {
