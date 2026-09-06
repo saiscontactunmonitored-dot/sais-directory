@@ -25,10 +25,28 @@
             max-width: 500px;
             box-sizing: border-box;
         }
+        .portal-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+        .portal-header h1 {
+            font-size: 20px;
+            color: #2c3e50;
+            margin: 0 0 5px 0;
+        }
+        .portal-header p {
+            font-size: 14px;
+            color: #27ae60;
+            font-weight: bold;
+            margin: 0;
+        }
         h2 {
             margin-bottom: 20px;
             color: #2c3e50;
             text-align: center;
+            font-size: 18px;
         }
         .form-group {
             margin-bottom: 15px;
@@ -107,10 +125,12 @@
             text-decoration: underline;
         }
         .policy-links {
-            margin-top: 15px;
+            margin-top: 20px;
             text-align: center;
             font-size: 12px;
             color: #7f8c8d;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
         }
         .policy-links a {
             color: #7f8c8d;
@@ -122,6 +142,12 @@
 <body>
 
 <div class="container">
+
+    <!-- PROMINENT HEADER -->
+    <div class="portal-header">
+        <h1>Somerset Animal Business Directory Login / Sign Up</h1>
+        <p>100% Free Listing & Portal Management</p>
+    </div>
 
     <!-- LOGIN VIEW -->
     <div id="loginView">
@@ -172,7 +198,7 @@
             <!-- Claim Dynamic Fields -->
             <div id="claimFields" class="form-group">
                 <label for="regBusinessSearch">Business Name or ID (from directory)</label>
-                <input type="text" id="regBusinessSearch" placeholder="e.g., St Giles Centre or SAIS-1" required>
+                <input type="text" id="regBusinessSearch" placeholder="e.g., Somerset Pet Business or SAIS-1" required>
             </div>
 
             <!-- New Business Dynamic Fields -->
@@ -181,7 +207,7 @@
                 <input type="text" id="regNewBusinessName" placeholder="Enter your business name">
             </div>
 
-            <button type="submit" id="regBtn">Submit Registration</button>
+            <button type="submit" id="regBtn">Submit Free Registration</button>
             <div class="message" id="regMessage"></div>
         </form>
         <div class="nav-links">
@@ -211,9 +237,7 @@
         <p id="welcomeUser" style="font-size: 14px; color: #555; text-align: center; margin-bottom: 20px;"></p>
         
         <form id="dashboardForm">
-            <!-- Dynamic fields load here based on your spreadsheet headers -->
             <div id="dynamicFieldsContainer"></div>
-
             <button type="submit" id="updateBizBtn">Save Changes</button>
             <div class="message" id="dashboardMessage"></div>
         </form>
@@ -236,7 +260,6 @@
     let currentUser = null;
     let currentBusiness = null;
 
-    // View Management Helpers
     function showView(viewId) {
         ['loginView', 'registerView', 'forgotView', 'dashboardView'].forEach(id => {
             document.getElementById(id).classList.add('hidden');
@@ -352,7 +375,7 @@
             msg.textContent = 'Error: ' + error.message;
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Submit Registration';
+            btn.textContent = 'Submit Free Registration';
         }
     });
 
@@ -381,7 +404,6 @@
         }
     });
 
-    // Populate Dashboard Fields Dynamically based on Spreadsheet Headers
     function loadDashboardData() {
         document.getElementById('welcomeUser').textContent = `Logged in as: ${currentUser.email} (Business ID: ${currentUser.businessId})`;
         const container = document.getElementById('dynamicFieldsContainer');
@@ -402,7 +424,6 @@
             label.textContent = key;
             group.appendChild(label);
 
-            // Keep Business ID uneditable by owner directly
             if (key === 'Business ID') {
                 const input = document.createElement('input');
                 input.type = 'text';
@@ -459,14 +480,12 @@
         }
     });
 
-    // Deactivation Request Helper
     function requestDeactivation() {
         if (confirm("Are you sure you want to request deactivation or removal of your directory listing? This will notify site administration.")) {
             alert("Deactivation request sent to support team.");
         }
     }
 
-    // Logout
     document.getElementById('logoutBtn').addEventListener('click', function() {
         currentUser = null;
         currentBusiness = null;
