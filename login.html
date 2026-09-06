@@ -58,7 +58,7 @@
                 <input type="email" id="regEmail" required placeholder="name@business.com">
             </div>
             <div class="form-group">
-                <label for="regPassword">Create Password</label>
+                <label for="regPassword">Create Password (Min 6 characters)</label>
                 <input type="password" id="regPassword" required placeholder="Choose a secure password">
             </div>
             <div class="form-group">
@@ -167,15 +167,28 @@
     window.addEventListener('keypress', resetIdleTimer);
     window.addEventListener('click', resetIdleTimer);
 
-    // 1. REGISTRATION SUBMISSION
+    // 1. REGISTRATION SUBMISSION (With Frontend Sanitization & Validation)
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const email = document.getElementById('regEmail').value.trim();
+        const email = document.getElementById('regEmail').value.trim().toLowerCase();
         const password = document.getElementById('regPassword').value.trim();
         const phone = document.getElementById('regPhone').value.trim();
-        const businessId = document.getElementById('regBusinessId').value.trim();
+        const businessId = document.getElementById('regBusinessId').value.trim().toUpperCase();
         const msg = document.getElementById('regMessage');
         const btn = document.getElementById('regBtn');
+
+        // Validation Checks
+        if (!email.includes('@') || !email.includes('.')) {
+            msg.style.color = '#e74c3c';
+            msg.textContent = 'Please enter a valid email address.';
+            return;
+        }
+
+        if (password.length < 6) {
+            msg.style.color = '#e74c3c';
+            msg.textContent = 'Password must be at least 6 characters long.';
+            return;
+        }
 
         btn.disabled = true;
         btn.textContent = 'Submitting...';
@@ -207,7 +220,7 @@
     // 2. LOGIN & STATUS CHECK
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const email = document.getElementById('loginEmail').value.trim();
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
         const password = document.getElementById('loginPassword').value.trim();
         const msg = document.getElementById('loginMessage');
         const btn = document.getElementById('loginBtn');
@@ -318,7 +331,7 @@
 
         let businessData = {};
         inputs.forEach(input => {
-            if (input.name) businessData[input.name] = input.value;
+            if (input.name) businessData[input.name] = input.value.trim();
         });
 
         btn.disabled = true;
@@ -353,6 +366,12 @@
         const newPassword = document.getElementById('newPassword').value.trim();
         const msg = document.getElementById('passwordMessage');
         const btn = document.getElementById('passwordBtn');
+
+        if (newPassword.length < 6) {
+            msg.style.color = '#e74c3c';
+            msg.textContent = 'New password must be at least 6 characters long.';
+            return;
+        }
 
         btn.disabled = true;
         btn.textContent = 'Updating...';
