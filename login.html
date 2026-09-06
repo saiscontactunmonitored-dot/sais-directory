@@ -3,85 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Login | SAIS Directory</title>
+    <title>Business Portal | SAIS Directory</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f8; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { margin-bottom: 20px; color: #333; text-align: center; }
+        body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 500px; box-sizing: border-box; }
+        h2, h3 { margin-top: 0; color: #333; text-align: center; }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #2c3e50; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 14px; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        textarea { resize: vertical; height: 80px; }
+        button { width: 100%; padding: 12px; background: #2c3e50; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 10px; font-weight: bold; }
         button:hover { background: #34495e; }
-        .message { margin-top: 15px; text-align: center; font-size: 14px; color: #e74c3c; }
+        .message { margin-top: 15px; text-align: center; font-size: 14px; }
+        .hidden { display: none; }
+        .nav-links { text-align: center; margin-top: 15px; font-size: 14px; }
+        .nav-links a { color: #3498db; text-decoration: none; cursor: pointer; }
+        .nav-links a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
-<div class="login-card">
-    <h2>Business Portal Login</h2>
-    <form id="signupForm">
-        <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" required placeholder="name@business.com">
+<div class="card">
+    <div id="loginView">
+        <h2>Business Portal Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail">Registered Email Address</label>
+                <input type="email" id="loginEmail" required placeholder="name@business.com">
+            </div>
+            <button type="submit" id="loginBtn">Log In</button>
+            <div class="message" id="loginMessage"></div>
+        </form>
+        <div class="nav-links">
+            <p>Don't have an account or need access? <a id="showRegisterLink">Register here</a></p>
         </div>
-        <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" placeholder="01234 567890">
+    </div>
+
+    <div id="registerView" class="hidden">
+        <h2>Request Business Access</h2>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="regEmail">Email Address</label>
+                <input type="email" id="regEmail" required placeholder="name@business.com">
+            </div>
+            <div class="form-group">
+                <label for="regPhone">Phone Number</label>
+                <input type="tel" id="regPhone" placeholder="01234 567890">
+            </div>
+            <div class="form-group">
+                <label for="regBusinessId">Your Business ID (from the directory)</label>
+                <input type="text" id="regBusinessId" required placeholder="e.g., SAIS-1">
+            </div>
+            <button type="submit" id="regBtn">Request Access</button>
+            <div class="message" id="regMessage"></div>
+        </form>
+        <div class="nav-links">
+            <p>Already registered? <a id="showLoginLink">Back to Login</a></p>
         </div>
-        <div class="form-group">
-            <label for="businessId">Your Business ID (from your directory sheet)</label>
-            <input type="text" id="businessId" placeholder="e.g., SAIS-1">
+    </div>
+
+    <div id="dashboardView" class="hidden">
+        <h2>Edit Your Business Listing</h2>
+        <p id="welcomeUser" style="text-align: center; color: #666; font-size: 13px; margin-bottom: 20px;"></p>
+        <form id="editForm">
+            <div id="dynamicFields"></div>
+            <button type="submit" id="saveBtn">Save Changes</button>
+            <div class="message" id="editMessage"></div>
+        </form>
+        <div class="nav-links">
+            <a id="logoutLink">Log Out</a>
         </div>
-        <button type="submit" id="submitBtn">Request Access / Sign Up</button>
-        <div class="message" id="responseMessage"></div>
-    </form>
+    </div>
 </div>
 
 <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxekvbIPAWrk1rCiD8BmZWR_8q0Dik1imzdsKQIVxd1Du9D5ZkD-44iE1oXwN6sDIo3/exec";
 
+    // Navigation toggles
+    document.getElementById('showRegisterLink').addEventListener('click', () => {
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('registerView').classList.remove('hidden');
+    });
+    document.getElementById('showLoginLink').addEventListener('click', () => {
+        document.getElementById('registerView').classList.add('hidden');
+        document.getElementById('loginView').classList.remove('hidden');
+    });
+    document.getElementById('logoutLink').addEventListener('click', () => {
+        document.getElementById('dashboardView').classList.add('hidden');
+        document.getElementById('loginView').classList.remove('hidden');
+        document.getElementById('loginForm').reset();
+    });
+
+    // 1. REGISTRATION SUBMISSION
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
-        const email = document.getElementById('email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const businessId = document.getElementById('businessId').value.trim();
-        const messageDiv = document.getElementById('responseMessage');
-        const submitBtn = document.getElementById('submitBtn');
+        const email = document.getElementById('regEmail').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
+        const businessId = document.getElementById('regBusinessId').value.trim();
+        const msg = document.getElementById('regMessage');
+        const btn = document.getElementById('regBtn');
 
-        const userId = 'USR-' + Date.now();
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting...';
-        messageDiv.style.color = '#555';
-        messageDiv.textContent = 'Connecting to database...';
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+        msg.style.color = '#555';
+        msg.textContent = 'Connecting...';
 
         try {
-            const response = await fetch(WEB_APP_URL, {
+            await fetch(WEB_APP_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'register',
-                    userId: userId,
+                    userId: 'USR-' + Date.now(),
                     email: email,
                     phone: phone,
                     businessId: businessId
                 })
             });
-
-            messageDiv.style.color = 'green';
-            messageDiv.textContent = 'Registration submitted successfully! Pending admin approval.';
+            msg.style.color = 'green';
+            msg.textContent = 'Registration submitted successfully! Pending admin approval.';
             document.getElementById('signupForm').reset();
         } catch (error) {
-            messageDiv.style.color = '#e74c3c';
-            messageDiv.textContent = 'Error: ' + error.message;
+            msg.style.color = '#e74c3c';
+            msg.textContent = 'Error: ' + error.message;
         } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Request Access / Sign Up';
+            btn.disabled = false;
+            btn.textContent = 'Request Access';
+        }
+    });
+
+    // 2. LOGIN & STATUS CHECK
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const msg = document.getElementById('loginMessage');
+        const btn = document.getElementById('loginBtn');
+
+        btn.disabled = true;
+        btn.textContent = 'Checking...';
+        msg.style.color = '#555';
+        msg.textContent = 'Verifying account...';
+
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'login', email: email })
+            });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                loadDashboard(result.user, result.business);
+            } else if (result.status === 'pending') {
+                msg.style.color = '#d35400';
+                msg.textContent = result.message;
+            } else {
+                msg.style.color = '#e74c3c';
+                msg.textContent = result.message;
+            }
+        } catch (error) {
+            msg.style.color = '#e74c3c';
+            msg.textContent = 'Connection error. Please try again.';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Log In';
+        }
+    });
+
+    let currentBusinessId = '';
+
+    // 3. BUILD DASHBOARD FORM DYNAMICALLY
+    function loadDashboard(user, business) {
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('dashboardView').classList.remove('hidden');
+        document.getElementById('welcomeUser').textContent = `Logged in as: ${user.email} (Business ID: ${user.businessId})`;
+        currentBusinessId = user.businessId;
+
+        const container = document.getElementById('dynamicFields');
+        container.innerHTML = '';
+
+        if (!business) {
+            container.innerHTML = '<p style="color:red; text-align:center;">Error: Business record could not be found matching ID ' + user.businessId + '</p>';
+            return;
+        }
+
+        // Loop through each column of the business data and create inputs
+        for (let key in business) {
+            // Keep system tracking keys hidden or read-only
+            if (key === '_sheetRow') continue;
+
+            const div = document.createElement('div');
+            div.className = 'form-group';
+
+            const label = document.createElement('label');
+            label.textContent = key;
+            div.appendChild(label);
+
+            if (key.toLowerCase().includes('id')) {
+                // Keep Business ID read-only
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = business[key];
+                input.disabled = true;
+                input.style.background = '#e9ecef';
+                div.appendChild(input);
+            } else if (key.toLowerCase().includes('description') || key.toLowerCase().includes('detail')) {
+                const textarea = document.createElement('textarea');
+                textarea.name = key;
+                textarea.value = business[key] || '';
+                div.appendChild(textarea);
+            } else {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = key;
+                input.value = business[key] || '';
+                div.appendChild(input);
+            }
+            container.appendChild(div);
+        }
+    }
+
+    // 4. SUBMIT UPDATES TO SPREADSHEET
+    document.getElementById('editForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const msg = document.getElementById('editMessage');
+        const btn = document.getElementById('saveBtn');
+        const inputs = document.querySelectorAll('#dynamicFields input, #dynamicFields textarea');
+
+        let businessData = {};
+        inputs.forEach(input => {
+            if (input.name) {
+                businessData[input.name] = input.value;
+            }
+        });
+
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+        msg.style.color = '#555';
+        msg.textContent = 'Updating live directory...';
+
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'updateBusiness',
+                    businessId: currentBusinessId,
+                    businessData: businessData
+                })
+            });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                msg.style.color = 'green';
+                msg.textContent = 'Changes saved successfully and updated live on the directory!';
+            } else {
+                msg.style.color = '#e74c3c';
+                msg.textContent = 'Error: ' + result.message;
+            }
+        } catch (error) {
+            msg.style.color = '#e74c3c';
+            msg.textContent = 'Save failed: ' + error.message;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Save Changes';
         }
     });
 </script>
