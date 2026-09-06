@@ -139,6 +139,22 @@
       color: var(--brand-red);
     }
 
+    .header-links a.login-link {
+      background-color: var(--neutral-100);
+      color: var(--neutral-900) !important;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--neutral-200);
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .header-links a.login-link:hover {
+      background-color: var(--neutral-900);
+      color: #ffffff !important;
+      border-color: var(--neutral-900);
+    }
+
     .header-links a.add-link {
       background-color: var(--brand-red);
       color: #ffffff !important;
@@ -836,7 +852,82 @@
       background-color: var(--neutral-200);
     }
 
-    /* iOS INSTRUCTIONS MODAL */
+    /* COOKIE CONSENT BANNER */
+    .cookie-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--neutral-900);
+      color: #ffffff;
+      padding: 16px 20px;
+      z-index: 1200;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cookie-banner.is-visible {
+      transform: translateY(0);
+    }
+
+    .cookie-text {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      max-width: 800px;
+    }
+
+    .cookie-text a {
+      color: #ffffff;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .cookie-actions {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .cookie-accept-btn {
+      background-color: var(--brand-red);
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .cookie-accept-btn:hover {
+      background-color: var(--brand-red-hover);
+    }
+
+    .cookie-decline-btn {
+      background-color: transparent;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .cookie-decline-btn:hover {
+      background-color: #334155;
+      color: #ffffff;
+    }
+
+    /* IOS INSTRUCTIONS MODAL */
     .ios-modal {
       position: fixed;
       top: 0;
@@ -967,6 +1058,7 @@
       color: var(--neutral-900);
       text-decoration: underline;
       font-weight: 600;
+      margin-right: 8px;
     }
 
     .footer-contact {
@@ -1022,9 +1114,15 @@
         border-bottom: 1px solid var(--neutral-200);
       }
 
-      .header-links a.add-link {
+      .header-links a.login-link {
         text-align: center;
         margin-top: 12px;
+        border: 1px solid var(--neutral-200);
+      }
+
+      .header-links a.add-link {
+        text-align: center;
+        margin-top: 8px;
         border-bottom: none;
         padding: 12px 16px;
       }
@@ -1035,6 +1133,9 @@
       .hero-banner-wrapper { padding: 40px 16px; }
       .advertise-card { flex-direction: column; align-items: flex-start; }
       .advertise-btn { width: 100%; text-align: center; }
+      .cookie-banner { flex-direction: column; align-items: flex-start; }
+      .cookie-actions { width: 100%; }
+      .cookie-accept-btn, .cookie-decline-btn { flex: 1; text-align: center; }
     }
 
     @media (max-width: 600px) {
@@ -1084,6 +1185,7 @@
     <nav id="headerLinks" class="header-links">
       <a href="https://www.somersetanimalinformationservices.com/" target="_top">Main Page</a>
       <a href="https://information.somersetanimalinformationservices.com/" target="_top">Information Hub UK</a>
+      <a class="login-link" href="./login.html" target="_top">Login / Sign Up</a>
       <a class="add-link" href="https://docs.google.com/forms/d/e/1FAIpQLSdWV3d-R7vjA_HB0_hBLr0b32ONpuUdjmVv0RGwmJBWkfd_1Q/viewform?usp=header" target="_top">+ Add / Remove Business</a>
     </nav>
   </header>
@@ -1192,6 +1294,17 @@
     </div>
   </div>
 
+  <!-- COOKIE CONSENT BANNER -->
+  <div id="cookieBanner" class="cookie-banner">
+    <div class="cookie-text">
+      We use cookies to enhance your user experience, analyse site traffic, and provide secure functionality. By clicking "Accept All", you consent to our use of cookies. Read our <a href="./privacy.html" target="_top">Privacy Policy</a> to learn more.
+    </div>
+    <div class="cookie-actions">
+      <button id="cookieAcceptBtn" class="cookie-accept-btn" type="button">Accept All</button>
+      <button id="cookieDeclineBtn" class="cookie-decline-btn" type="button">Decline</button>
+    </div>
+  </div>
+
   <!-- iOS INSTRUCTIONAL MODAL -->
   <div id="iosModal" class="ios-modal" aria-hidden="true">
     <div class="ios-modal-content">
@@ -1221,7 +1334,12 @@
       <div class="footer-top">
         <div class="footer-copyright">
           <p>© 2026 Somerset Animal Business Directory. All rights reserved.</p>
-          <p>Content and images are protected under the Copyright, Designs and Patents Act 1988. Unauthorised use is strictly prohibited. | <a href="https://www.somersetanimalinformationservices.com/copyright-notice" target="_top">Copyright Notice</a></p>
+          <p>
+            <a href="./privacy.html" target="_top">Privacy Policy</a> | 
+            <a href="./terms.html" target="_top">Terms & Conditions</a> | 
+            <a href="https://www.somersetanimalinformationservices.com/copyright-notice" target="_top">Copyright Notice</a>
+          </p>
+          <p>Content and images are protected under the Copyright, Designs and Patents Act 1988. Unauthorised use is strictly prohibited.</p>
         </div>
         <div class="footer-contact">
           <strong>Contact Us</strong>
@@ -1234,7 +1352,7 @@
 
   <script>
     // Live Google Apps Script Endpoint URL
-    var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwh05Z4xaTew5zgv0DoAXX7CF3Q03xVUogAf_TZTKY5cHMkET12OfeqtImap1uqb2oU/exec';
+    var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFjoMUErvU-WySAPtwL33MNYc8uxaoz2GOoCV6n8rRV2iiDwHssMDDV2cGABCuoeGK/exec';
 
     var allBusinesses = [];
     var filteredBusinesses = [];
@@ -1273,10 +1391,16 @@
     var iosModalClose = document.getElementById('iosModalClose');
     var iosGotItBtn = document.getElementById('iosGotItBtn');
 
+    // Cookie Banner Elements
+    var cookieBanner = document.getElementById('cookieBanner');
+    var cookieAcceptBtn = document.getElementById('cookieAcceptBtn');
+    var cookieDeclineBtn = document.getElementById('cookieDeclineBtn');
+
     document.addEventListener('DOMContentLoaded', function() {
       fetchDirectoryData();
       setupEventListeners();
       setupPWAInstaller();
+      setupCookieConsent();
     });
 
     function toggleMenu() {
@@ -1291,32 +1415,47 @@
       menuOverlay.classList.remove('is-active');
     }
 
+    // Cookie Consent Logic
+    function setupCookieConsent() {
+      var cookieConsent = localStorage.getItem('sais_cookie_consent');
+      if (!cookieConsent) {
+        setTimeout(function() {
+          cookieBanner.classList.add('is-visible');
+        }, 1000);
+      }
+
+      cookieAcceptBtn.addEventListener('click', function() {
+        localStorage.setItem('sais_cookie_consent', 'accepted');
+        cookieBanner.classList.remove('is-visible');
+      });
+
+      cookieDeclineBtn.addEventListener('click', function() {
+        localStorage.setItem('sais_cookie_consent', 'declined');
+        cookieBanner.classList.remove('is-visible');
+      });
+    }
+
     // PWA Install Logic
     function setupPWAInstaller() {
-      // Check if already running as installed PWA or dismissed recently
       var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
       var dismissedTime = localStorage.getItem('sais_pwa_dismissed');
       var now = new Date().getTime();
 
       if (isStandalone || (dismissedTime && (now - dismissedTime < 86400000 * 7))) {
-        return; // Don't show if installed or dismissed within last 7 days
+        return;
       }
 
-      // Capture Android / Chrome beforeinstallprompt
       window.addEventListener('beforeinstallprompt', function(e) {
         e.preventDefault();
         deferredPrompt = e;
-        // Show banner after a slight delay
         setTimeout(function() {
           pwaInstallBanner.classList.add('is-visible');
         }, 2000);
       });
 
-      // For iOS / Safari or browsers not triggering beforeinstallprompt automatically
       var isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
       if (!deferredPrompt) {
         setTimeout(function() {
-          // Only show if not standalone
           if (!isStandalone) {
             pwaInstallBanner.classList.add('is-visible');
           }
@@ -1336,7 +1475,6 @@
           iosModal.classList.add('active');
           iosModal.setAttribute('aria-hidden', 'false');
         } else {
-          // Fallback alert / instruction if prompt isn't ready
           alert('To add this app, open your browser menu (three dots or share icon) and select "Add to Home screen".');
         }
       });
@@ -1382,8 +1520,8 @@
     function getDescription(b) { return getVal(b, ['Description', 'Services', 'About', 'Notes', 'Details']); }
 
     async function fetchDirectoryData() {
-      var cacheKey = 'sais_directory_cache_v2';
-      var cachedTimeKey = 'sais_directory_time_v2';
+      var cacheKey = 'sais_directory_cache_v3';
+      var cachedTimeKey = 'sais_directory_time_v3';
       var cachedData = localStorage.getItem(cacheKey);
       var cachedTime = localStorage.getItem(cachedTimeKey);
       var now = new Date().getTime();
