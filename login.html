@@ -80,7 +80,7 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzyG2HaUuUStz4fWuJcS_0-nCSJbbJcSDAsOgQ22pnS3r2tlvb96jiIAe_p8qJKo98R/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxnKj9lyKlR-PNAH0HeTLT4L9MbDWM7a-Q_0XA4vpE3-_zJuoG3jgGKjZd5wYKzSP--/exec";
 
     document.getElementById('showRegisterLink').addEventListener('click', () => {
         document.getElementById('loginView').classList.add('hidden');
@@ -96,7 +96,7 @@
         document.getElementById('loginForm').reset();
     });
 
-    // 1. REGISTRATION SUBMISSION (POST)
+    // 1. REGISTRATION SUBMISSION (GET)
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('regEmail').value.trim();
@@ -111,21 +111,18 @@
         msg.textContent = 'Connecting...';
 
         try {
-            await fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: 'register',
-                    userId: 'USR-' + Date.now(),
-                    email: email,
-                    phone: phone,
-                    businessId: businessId
-                })
-            });
-            msg.style.color = 'green';
-            msg.textContent = 'Registration submitted successfully! Pending admin approval.';
-            document.getElementById('signupForm').reset();
+            const url = `${WEB_APP_URL}?action=register&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&businessId=${encodeURIComponent(businessId)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.status === 'success' || result.status === 'exists') {
+                msg.style.color = 'green';
+                msg.textContent = result.message;
+                document.getElementById('signupForm').reset();
+            } else {
+                msg.style.color = '#e74c3c';
+                msg.textContent = result.message;
+            }
         } catch (error) {
             msg.style.color = '#e74c3c';
             msg.textContent = 'Error: ' + error.message;
@@ -135,7 +132,7 @@
         }
     });
 
-    // 2. LOGIN & STATUS CHECK (POST)
+    // 2. LOGIN & STATUS CHECK (GET)
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value.trim();
@@ -148,14 +145,8 @@
         msg.textContent = 'Verifying account...';
 
         try {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: 'login',
-                    email: email
-                })
-            });
+            const url = `${WEB_APP_URL}?action=login&email=${encodeURIComponent(email)}`;
+            const response = await fetch(url);
             const result = await response.json();
             console.log("Server Response:", result);
 
@@ -227,7 +218,7 @@
         }
     }
 
-    // 3. SUBMIT UPDATES (POST)
+    // 3. SUBMIT UPDATES (GET)
     document.getElementById('editForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const msg = document.getElementById('editMessage');
@@ -245,15 +236,8 @@
         msg.textContent = 'Updating live directory...';
 
         try {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: 'updateBusiness',
-                    businessId: currentBusinessId,
-                    businessData: businessData
-                })
-            });
+            const url = `${WEB_APP_URL}?action=updateBusiness&businessId=${encodeURIComponent(currentBusinessId)}&businessData=${encodeURIComponent(JSON.stringify(businessData))}`;
+            const response = await fetch(url);
             const result = await response.json();
 
             if (result.status === 'success') {
