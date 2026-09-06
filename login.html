@@ -9,25 +9,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Matched precisely to your brand header and red accent */
             --primary: #1b263b;
             --primary-hover: #111827;
             --accent: #d32f2f;
             --accent-hover: #b71c1c;
             --bg-color: #f8fafc;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.95);
             --text-main: #1e293b;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
             --radius-sm: 10px;
             --radius-lg: 20px;
-            --shadow-subtle: 0 20px 25px -5px rgba(27, 38, 59, 0.06), 0 8px 10px -6px rgba(27, 38, 59, 0.04);
+            /* Enhanced box-shadow with a soft red glow */
+            --shadow-subtle: 0 20px 25px -5px rgba(27, 38, 59, 0.08), 0 8px 10px -6px rgba(27, 38, 59, 0.04), 0 0 30px rgba(211, 47, 47, 0.15);
             --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-color);
+            /* Background image matching your directory hero area with a subtle dark overlay for readability */
+            background: linear-gradient(rgba(27, 38, 59, 0.65), rgba(27, 38, 59, 0.75)), url('https://images.unsplash.com/photo-1548767797-d8c844163c4c?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
             color: var(--text-main);
             margin: 0;
             padding: 24px;
@@ -40,13 +42,14 @@
 
         .container {
             background: var(--card-bg);
+            backdrop-filter: blur(8px);
             padding: 40px;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-subtle);
             width: 100%;
             max-width: 520px;
             box-sizing: border-box;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
         .portal-header {
@@ -107,9 +110,10 @@
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: var(--accent);
             background-color: #ffffff;
-            box-shadow: 0 0 0 4px rgba(27, 38, 59, 0.08);
+            /* Glowing red focus ring */
+            box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.15);
         }
 
         textarea {
@@ -130,12 +134,13 @@
             font-family: inherit;
             margin-top: 8px;
             transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
+            box-shadow: 0 4px 14px rgba(211, 47, 47, 0.35);
         }
 
         button:hover {
             background-color: var(--accent-hover);
             transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(211, 47, 47, 0.45);
         }
 
         button:active {
@@ -161,6 +166,7 @@
             background-color: #f1f5f9;
             color: var(--primary);
             border-color: #cbd5e1;
+            box-shadow: none;
         }
 
         .danger-btn {
@@ -175,6 +181,7 @@
             background-color: var(--accent);
             color: white;
             border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
         }
 
         .message {
