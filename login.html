@@ -9,11 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Matched directly to your site branding (Dark Navy/Slate Header & Red Accent) */
-            --primary: #1e293b;
-            --primary-hover: #0f172a;
-            --accent: #dc2626;
-            --accent-hover: #b91c1c;
+            /* Matched precisely to your brand header and red accent */
+            --primary: #1b263b;
+            --primary-hover: #111827;
+            --accent: #d32f2f;
+            --accent-hover: #b71c1c;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #1e293b;
@@ -21,7 +21,7 @@
             --border-color: #e2e8f0;
             --radius-sm: 10px;
             --radius-lg: 20px;
-            --shadow-subtle: 0 20px 25px -5px rgba(30, 41, 59, 0.05), 0 8px 10px -6px rgba(30, 41, 59, 0.05);
+            --shadow-subtle: 0 20px 25px -5px rgba(27, 38, 59, 0.06), 0 8px 10px -6px rgba(27, 38, 59, 0.04);
             --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -109,7 +109,7 @@
             outline: none;
             border-color: var(--primary);
             background-color: #ffffff;
-            box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.08);
+            box-shadow: 0 0 0 4px rgba(27, 38, 59, 0.08);
         }
 
         textarea {
@@ -130,7 +130,7 @@
             font-family: inherit;
             margin-top: 8px;
             transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
         }
 
         button:hover {
@@ -246,7 +246,6 @@
 
 <div class="container">
 
-    <!-- PROMINENT HEADER MATCHING YOUR SITE -->
     <div class="portal-header">
         <h1>Somerset Animal Business Directory</h1>
         <p>Somerset Animal Information Services</p>
@@ -298,13 +297,11 @@
                 <input type="tel" id="regPhone" placeholder="01234 567890">
             </div>
 
-            <!-- Claim Dynamic Fields -->
             <div id="claimFields" class="form-group">
                 <label for="regBusinessSearch">Business Name or ID (from directory)</label>
                 <input type="text" id="regBusinessSearch" placeholder="e.g., Somerset Pet Business or SAIS-1" required>
             </div>
 
-            <!-- New Business Dynamic Fields (Restricted List) -->
             <div id="newFields" class="form-group hidden">
                 <label for="regNewBusinessName">Business Name</label>
                 <input type="text" id="regNewBusinessName" placeholder="Enter your business name">
@@ -389,7 +386,6 @@
     let currentUser = null;
     let currentBusiness = null;
 
-    // Allowed fields whitelist matching exact column titles
     const ALLOWED_FIELDS = [
         "Business Name",
         "Category",
@@ -456,11 +452,11 @@
                 msg.style.color = '#d97706';
                 msg.textContent = result.message;
             } else {
-                msg.style.color = '#dc2626';
+                msg.style.color = '#d32f2f';
                 msg.textContent = result.message;
             }
         } catch (error) {
-            msg.style.color = '#dc2626';
+            msg.style.color = '#d32f2f';
             msg.textContent = 'Connection error: ' + error.message;
         } finally {
             btn.disabled = false;
@@ -479,7 +475,7 @@
         const btn = document.getElementById('regBtn');
 
         if (password.length < 6) {
-            msg.style.color = '#dc2626';
+            msg.style.color = '#d32f2f';
             msg.textContent = 'Password must be at least 6 characters.';
             return;
         }
@@ -516,11 +512,11 @@
                 msg.textContent = result.message;
                 document.getElementById('signupForm').reset();
             } else {
-                msg.style.color = '#dc2626';
+                msg.style.color = '#d32f2f';
                 msg.textContent = result.message;
             }
         } catch (error) {
-            msg.style.color = '#dc2626';
+            msg.style.color = '#d32f2f';
             msg.textContent = 'Error: ' + error.message;
         } finally {
             btn.disabled = false;
@@ -544,7 +540,7 @@
             msg.style.color = '#16a34a';
             msg.textContent = result.message;
         } catch (error) {
-            msg.style.color = '#dc2626';
+            msg.style.color = '#d32f2f';
             msg.textContent = 'Error sending reset code.';
         } finally {
             btn.disabled = false;
@@ -558,11 +554,10 @@
         container.innerHTML = '';
 
         if (!currentBusiness) {
-            container.innerHTML = '<p style="color: #dc2626; text-align: center;">No linked business record found.</p>';
+            container.innerHTML = '<p style="color: #d32f2f; text-align: center;">No linked business record found.</p>';
             return;
         }
 
-        // Always show Business ID first (read-only)
         const idGroup = document.createElement('div');
         idGroup.className = 'form-group';
         const idLabel = document.createElement('label');
@@ -575,7 +570,6 @@
         idGroup.appendChild(idInput);
         container.appendChild(idGroup);
 
-        // Render only the whitelisted fields
         ALLOWED_FIELDS.forEach(fieldKey => {
             const group = document.createElement('div');
             group.className = 'form-group';
@@ -626,11 +620,11 @@
                 msg.style.color = '#16a34a';
                 msg.textContent = result.message;
             } else {
-                msg.style.color = '#dc2626';
+                msg.style.color = '#d32f2f';
                 msg.textContent = result.message;
             }
         } catch (error) {
-            msg.style.color = '#dc2626';
+            msg.style.color = '#d32f2f';
             msg.textContent = 'Error updating record.';
         } finally {
             btn.disabled = false;
