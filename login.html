@@ -64,7 +64,7 @@
         </div>
     </div>
 
-    <!-- DASHBOARD VIEW (Shown when approved) -->
+    <!-- DASHBOARD VIEW -->
     <div id="dashboardView" class="hidden">
         <h2>Edit Your Business Listing</h2>
         <p id="welcomeUser" style="text-align: center; color: #666; font-size: 13px; margin-bottom: 20px;"></p>
@@ -80,9 +80,8 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzzmMJGbOf3kjNmkKibwAD5cKgn0HnpTrsl1GKAm13UkSU4C_ykm7TEr3kK6oGOeS3l/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzyG2HaUuUStz4fWuJcS_0-nCSJbbJcSDAsOgQ22pnS3r2tlvb96jiIAe_p8qJKo98R/exec";
 
-    // Navigation toggles
     document.getElementById('showRegisterLink').addEventListener('click', () => {
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('registerView').classList.remove('hidden');
@@ -97,7 +96,7 @@
         document.getElementById('loginForm').reset();
     });
 
-    // 1. REGISTRATION SUBMISSION
+    // 1. REGISTRATION SUBMISSION (POST)
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('regEmail').value.trim();
@@ -115,7 +114,7 @@
             await fetch(WEB_APP_URL, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
                     action: 'register',
                     userId: 'USR-' + Date.now(),
@@ -136,7 +135,7 @@
         }
     });
 
-    // 2. LOGIN & STATUS CHECK (With Debug Logging)
+    // 2. LOGIN & STATUS CHECK (POST)
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value.trim();
@@ -149,10 +148,15 @@
         msg.textContent = 'Verifying account...';
 
         try {
-            const response = await fetch(`${WEB_APP_URL}?action=login&email=${encodeURIComponent(email)}`);
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'login',
+                    email: email
+                })
+            });
             const result = await response.json();
-            
-            // PRINT TO BROWSER CONSOLE FOR DEBUGGING
             console.log("Server Response:", result);
 
             if (result.status === 'success') {
@@ -176,7 +180,6 @@
 
     let currentBusinessId = '';
 
-    // 3. BUILD DASHBOARD FORM DYNAMICALLY
     function loadDashboard(user, business) {
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('dashboardView').classList.remove('hidden');
@@ -224,7 +227,7 @@
         }
     }
 
-    // 4. SUBMIT UPDATES TO SPREADSHEET
+    // 3. SUBMIT UPDATES (POST)
     document.getElementById('editForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const msg = document.getElementById('editMessage');
@@ -233,9 +236,7 @@
 
         let businessData = {};
         inputs.forEach(input => {
-            if (input.name) {
-                businessData[input.name] = input.value;
-            }
+            if (input.name) businessData[input.name] = input.value;
         });
 
         btn.disabled = true;
