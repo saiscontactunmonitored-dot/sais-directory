@@ -22,6 +22,9 @@
         .home-btn { position: absolute; top: 15px; left: 20px; font-size: 13px; color: #666; text-decoration: none; font-weight: bold; }
         .home-btn:hover { color: #2c3e50; }
         .section-box { margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; }
+        .legal-footer { text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; font-size: 12px; color: #777; }
+        .legal-footer a { color: #777; text-decoration: none; margin: 0 5px; }
+        .legal-footer a:hover { color: #3498db; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -105,12 +108,17 @@
             <a id="logoutLink">Log Out</a> | <a href="index.html">Return to Home</a>
         </div>
     </div>
+
+    <!-- LEGAL FOOTER LINKS -->
+    <div class="legal-footer">
+        <a href="privacy.html" target="_blank">Privacy Policy</a> | <a href="terms.html" target="_blank">Terms of Service</a>
+    </div>
 </div>
 
 <!-- COOKIE CONSENT BANNER -->
 <div id="cookieBanner" style="position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 15px 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); font-family: Arial, sans-serif; font-size: 14px;">
     <div style="margin-right: 20px; line-height: 1.4;">
-        We use essential cookies and local storage to ensure our business portal functions securely and reliably. Read our <a href="privacy.html" style="color: #3498db; text-decoration: underline;">Privacy Policy</a> for details.
+        We use essential cookies and local storage to ensure our business portal functions securely and reliably. Read our <a href="privacy.html" style="color: #3498db; text-decoration: underline;" target="_blank">Privacy Policy</a> for details.
     </div>
     <div>
         <button id="acceptCookies" style="background: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px;">Got it</button>
