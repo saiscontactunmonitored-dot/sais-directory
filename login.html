@@ -380,7 +380,6 @@
 
 <div class="page-wrapper">
 
-    <!-- STEP-BY-STEP INSTRUCTIONS PANEL (STAYS VISIBLE ACROSS ALL VIEWS) -->
     <div class="instructions-panel">
         <div>
             <h3>How to Use the Portal</h3>
@@ -409,7 +408,6 @@
         </div>
     </div>
 
-    <!-- MAIN PORTAL CONTAINER -->
     <div class="container">
 
         <div class="portal-header">
@@ -417,7 +415,6 @@
             <p>Somerset Animal Information Services</p>
         </div>
 
-        <!-- LOGIN VIEW -->
         <div id="loginView">
             <h2>Business Portal Login</h2>
             <form id="loginForm">
@@ -441,7 +438,6 @@
             </div>
         </div>
 
-        <!-- REGISTER VIEW -->
         <div id="registerView" class="hidden">
             <h2>Business Registration</h2>
             <form id="signupForm">
@@ -514,17 +510,31 @@
             </div>
         </div>
 
-        <!-- FORGOT PASSWORD VIEW -->
         <div id="forgotView" class="hidden">
             <h2>Reset Password</h2>
-            <form id="forgotForm">
-                <div class="form-group">
+            
+            <form id="forgotEmailForm">
+                <div class="form-group" id="forgotEmailGroup">
                     <label for="forgotEmail">Registered Email Address</label>
                     <input type="email" id="forgotEmail" required placeholder="name@business.com">
                 </div>
-                <button type="submit" id="forgotBtn">Send Reset Instructions</button>
-                <div class="message" id="forgotMessage"></div>
+                <button type="submit" id="forgotBtn">Send Reset Code</button>
             </form>
+
+            <form id="forgotVerifyForm" class="hidden" style="margin-top: 16px;">
+                <div class="form-group">
+                    <label for="resetCodeInput">Enter Verification Code</label>
+                    <input type="text" id="resetCodeInput" required placeholder="Enter code sent to email">
+                </div>
+                <div class="form-group">
+                    <label for="newResetPassword">New Password (Min 6 characters)</label>
+                    <input type="password" id="newResetPassword" required placeholder="Enter new password">
+                </div>
+                <button type="submit" id="verifyResetBtn">Verify & Update Password</button>
+            </form>
+
+            <div class="message" id="forgotMessage"></div>
+
             <div class="nav-links">
                 <p><a id="backToLoginFromForgot">Back to Login</a></p>
             </div>
@@ -533,7 +543,6 @@
             </div>
         </div>
 
-        <!-- DASHBOARD VIEW -->
         <div id="dashboardView" class="hidden">
             <h2>Manage Business Details</h2>
             <p id="welcomeUser"></p>
@@ -589,7 +598,17 @@
 
     document.getElementById('showRegisterLink').addEventListener('click', () => showView('registerView'));
     document.getElementById('showLoginLink').addEventListener('click', () => showView('loginView'));
-    document.getElementById('showForgotLink').addEventListener('click', () => showView('forgotView'));
+    
+    document.getElementById('showForgotLink').addEventListener('click', () => {
+        // Reset state of forgot password view
+        document.getElementById('forgotEmailForm').classList.remove('hidden');
+        document.getElementById('forgotVerifyForm').classList.add('hidden');
+        document.getElementById('forgotEmailForm').reset();
+        document.getElementById('forgotVerifyForm').reset();
+        document.getElementById('forgotMessage').textContent = '';
+        showView('forgotView');
+    });
+
     document.getElementById('backToLoginFromForgot').addEventListener('click', () => showView('loginView'));
 
     document.getElementById('regTypeSelect').addEventListener('change', function() {
@@ -705,27 +724,83 @@
         }
     });
 
-    document.getElementById('forgotForm').addEventListener('submit', async function(e) {
+    // Step 1: Request Password Reset Code
+    document.getElementById('forgotEmailForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('forgotEmail').value.trim();
         const msg = document.getElementById('forgotMessage');
         const btn = document.getElementById('forgotBtn');
 
         btn.disabled = true;
-        btn.textContent = 'Sending...';
+        btn.textContent = 'Sending code...';
+        msg.style.color = '#64748b';
+        msg.textContent = 'Generating reset code...';
 
         try {
             const url = `${WEB_APP_URL}?action=requestPasswordReset&email=${encodeURIComponent(email)}`;
             const response = await fetch(url);
             const result = await response.json();
-            msg.style.color = '#16a34a';
-            msg.textContent = result.message;
+
+            if (result.status === 'success') {
+                msg.style.color = '#16a34a';
+                msg.textContent = result.message;
+                // Switch to step 2 verification form
+                document.getElementById('forgotEmailForm').classList.add('hidden');
+                document.getElementById('forgotVerifyForm').classList.remove('hidden');
+            } else {
+                msg.style.color = '#d32f2f';
+                msg.textContent = result.message;
+            }
         } catch (error) {
             msg.style.color = '#d32f2f';
-            msg.textContent = 'Error sending reset code.';
+            msg.textContent = 'Connection error: ' + error.message;
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Send Reset Instructions';
+            btn.textContent = 'Send Reset Code';
+        }
+    });
+
+    // Step 2: Verify Code and Save New Password
+    document.getElementById('forgotVerifyForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('forgotEmail').value.trim();
+        const code = document.getElementById('resetCodeInput').value.trim();
+        const newPassword = document.getElementById('newResetPassword').value.trim();
+        const msg = document.getElementById('forgotMessage');
+        const btn = document.getElementById('verifyResetBtn');
+
+        if (newPassword.length < 6) {
+            msg.style.color = '#d32f2f';
+            msg.textContent = 'Password must be at least 6 characters.';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Updating...';
+        msg.style.color = '#64748b';
+        msg.textContent = 'Verifying code...';
+
+        try {
+            const url = `${WEB_APP_URL}?action=confirmPasswordReset&email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}&newPassword=${encodeURIComponent(newPassword)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                msg.style.color = '#16a34a';
+                msg.textContent = result.message + ' Redirecting to login...';
+                setTimeout(() => {
+                    showView('loginView');
+                }, 2500);
+            } else {
+                msg.style.color = '#d32f2f';
+                msg.textContent = result.message;
+            }
+        } catch (error) {
+            msg.style.color = '#d32f2f';
+            msg.textContent = 'Connection error: ' + error.message;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Verify & Update Password';
         }
     });
 
@@ -824,8 +899,8 @@
 
         try {
             const url = `${WEB_APP_URL}?action=requestDeactivation&businessId=${encodeURIComponent(bizId)}&businessName=${encodeURIComponent(bizName)}&email=${encodeURIComponent(userEmail)}`;
-            const response = await fetch(url);
-            const result = await response.json();
+            const responseObj = await fetch(url);
+            const result = await responseObj.json();
 
             if (result.status === 'success') {
                 alert("Deactivation request successfully sent to support team.");
