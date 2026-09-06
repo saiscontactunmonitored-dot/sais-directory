@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Login | SAIS Directory</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f8; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { margin-bottom: 20px; color: #333; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #2c3e50; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #34495e; }
+        .message { margin-top: 15px; text-align: center; font-size: 14px; color: #e74c3c; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>Business Portal Login</h2>
+    <form id="signupForm">
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" required placeholder="name@business.com">
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" placeholder="01234 567890">
+        </div>
+        <div class="form-group">
+            <label for="businessId">Your Business ID (from your directory sheet)</label>
+            <input type="text" id="businessId" placeholder="e.g., SAIS-1">
+        </div>
+        <button type="submit" id="submitBtn">Request Access / Sign Up</button>
+        <div class="message" id="responseMessage"></div>
+    </form>
+</div>
+
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxekvbIPAWrk1rCiD8BmZWR_8q0Dik1imzdsKQIVxd1Du9D5ZkD-44iE1oXwN6sDIo3/exec";
+
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const businessId = document.getElementById('businessId').value.trim();
+        const messageDiv = document.getElementById('responseMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const userId = 'USR-' + Date.now();
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        messageDiv.style.color = '#555';
+        messageDiv.textContent = 'Connecting to database...';
+
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'register',
+                    userId: userId,
+                    email: email,
+                    phone: phone,
+                    businessId: businessId
+                })
+            });
+
+            messageDiv.style.color = 'green';
+            messageDiv.textContent = 'Registration submitted successfully! Pending admin approval.';
+            document.getElementById('signupForm').reset();
+        } catch (error) {
+            messageDiv.style.color = '#e74c3c';
+            messageDiv.textContent = 'Error: ' + error.message;
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Request Access / Sign Up';
+        }
+    });
+</script>
+
+</body>
+</html>
