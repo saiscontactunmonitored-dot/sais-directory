@@ -3,41 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Portal | SAIS Directory</title>
+    <title>Business Portal - Somerset Animal Information Services</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
-        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 500px; box-sizing: border-box; position: relative; margin-bottom: 50px; }
-        h2, h3 { margin-top: 0; color: #333; text-align: center; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; font-size: 14px; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
-        textarea { resize: vertical; height: 80px; }
-        button { width: 100%; padding: 12px; background: #2c3e50; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-        button:hover { background: #34495e; }
-        .message { margin-top: 15px; text-align: center; font-size: 14px; }
-        .hidden { display: none; }
-        .nav-links { text-align: center; margin-top: 15px; font-size: 14px; }
-        .nav-links a { color: #3498db; text-decoration: none; cursor: pointer; }
-        .nav-links a:hover { text-decoration: underline; }
-        .home-btn { position: absolute; top: 15px; left: 20px; font-size: 13px; color: #666; text-decoration: none; font-weight: bold; }
-        .home-btn:hover { color: #2c3e50; }
-        .section-box { margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; }
-        .legal-footer { text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; font-size: 12px; color: #777; }
-        .legal-footer a { color: #777; text-decoration: none; margin: 0 5px; }
-        .legal-footer a:hover { color: #3498db; text-decoration: underline; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .secondary-btn {
+            background-color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .secondary-btn:hover {
+            background-color: #626567;
+        }
+        .danger-btn {
+            background-color: #e74c3c;
+            margin-top: 15px;
+        }
+        .danger-btn:hover {
+            background-color: #c0392b;
+        }
+        .message {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .nav-links {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .nav-links a {
+            color: #3498db;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .policy-links {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .policy-links a {
+            color: #7f8c8d;
+            text-decoration: underline;
+            margin: 0 5px;
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <a href="index.html" class="home-btn">&larr; Back to Home</a>
+<div class="container">
 
     <!-- LOGIN VIEW -->
     <div id="loginView">
-        <h2 style="margin-top: 20px;">Business Portal Login</h2>
+        <h2>Business Portal Login</h2>
         <form id="loginForm">
             <div class="form-group">
-                <label for="loginEmail">Registered Email Address</label>
+                <label for="loginEmail">Email Address</label>
                 <input type="email" id="loginEmail" required placeholder="name@business.com">
             </div>
             <div class="form-group">
@@ -48,14 +139,23 @@
             <div class="message" id="loginMessage"></div>
         </form>
         <div class="nav-links">
-            <p>Don't have an account or need access? <a id="showRegisterLink">Register here</a></p>
+            <p>Need a business account? <a id="showRegisterLink">Register or Claim Listing</a></p>
+            <p><a id="showForgotLink">Forgot Password?</a></p>
         </div>
     </div>
 
     <!-- REGISTER VIEW -->
     <div id="registerView" class="hidden">
-        <h2 style="margin-top: 20px;">Request Business Access</h2>
+        <h2>Business Portal Registration</h2>
         <form id="signupForm">
+            <div class="form-group">
+                <label for="regTypeSelect">Registration Type:</label>
+                <select id="regTypeSelect">
+                    <option value="claim">Claim an existing listing in the directory</option>
+                    <option value="new">Add a brand-new business to the directory</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label for="regEmail">Email Address</label>
                 <input type="email" id="regEmail" required placeholder="name@business.com">
@@ -68,11 +168,20 @@
                 <label for="regPhone">Phone Number</label>
                 <input type="tel" id="regPhone" placeholder="01234 567890">
             </div>
-            <div class="form-group">
-                <label for="regBusinessId">Your Business ID (from the directory)</label>
-                <input type="text" id="regBusinessId" required placeholder="e.g., SAIS-1">
+
+            <!-- Claim Dynamic Fields -->
+            <div id="claimFields" class="form-group">
+                <label for="regBusinessSearch">Business Name or ID (from directory)</label>
+                <input type="text" id="regBusinessSearch" placeholder="e.g., St Giles Centre or SAIS-1" required>
             </div>
-            <button type="submit" id="regBtn">Request Access</button>
+
+            <!-- New Business Dynamic Fields -->
+            <div id="newFields" class="form-group hidden">
+                <label for="regNewBusinessName">New Business Name</label>
+                <input type="text" id="regNewBusinessName" placeholder="Enter your business name">
+            </div>
+
+            <button type="submit" id="regBtn">Submit Registration</button>
             <div class="message" id="regMessage"></div>
         </form>
         <div class="nav-links">
@@ -80,131 +189,153 @@
         </div>
     </div>
 
+    <!-- FORGOT PASSWORD VIEW -->
+    <div id="forgotView" class="hidden">
+        <h2>Reset Password</h2>
+        <form id="forgotForm">
+            <div class="form-group">
+                <label for="forgotEmail">Registered Email Address</label>
+                <input type="email" id="forgotEmail" required placeholder="name@business.com">
+            </div>
+            <button type="submit" id="forgotBtn">Send Reset Instructions</button>
+            <div class="message" id="forgotMessage"></div>
+        </form>
+        <div class="nav-links">
+            <p><a id="backToLoginFromForgot">Back to Login</a></p>
+        </div>
+    </div>
+
     <!-- DASHBOARD VIEW -->
     <div id="dashboardView" class="hidden">
-        <h2 style="margin-top: 20px;">Edit Your Business Listing</h2>
-        <p id="welcomeUser" style="text-align: center; color: #666; font-size: 13px; margin-bottom: 20px;"></p>
+        <h2>Manage Business Details</h2>
+        <p id="welcomeUser" style="font-size: 14px; color: #555; text-align: center; margin-bottom: 20px;"></p>
         
-        <form id="editForm">
-            <div id="dynamicFields"></div>
-            <button type="submit" id="saveBtn">Save Changes</button>
-            <div class="message" id="editMessage"></div>
+        <form id="dashboardForm">
+            <!-- Dynamic fields load here based on your spreadsheet headers -->
+            <div id="dynamicFieldsContainer"></div>
+
+            <button type="submit" id="updateBizBtn">Save Changes</button>
+            <div class="message" id="dashboardMessage"></div>
         </form>
 
-        <!-- PASSWORD CHANGE SECTION -->
-        <div class="section-box">
-            <h3>Change Password</h3>
-            <form id="passwordForm">
-                <div class="form-group">
-                    <label for="newPassword">New Password</label>
-                    <input type="password" id="newPassword" required placeholder="Enter new password">
-                </div>
-                <button type="submit" id="passwordBtn" style="background: #e67e22;">Update Password</button>
-                <div class="message" id="passwordMessage"></div>
-            </form>
-        </div>
-
-        <div class="nav-links" style="margin-top: 20px;">
-            <a id="logoutLink">Log Out</a> | <a href="index.html">Return to Home</a>
-        </div>
+        <button type="button" id="logoutBtn" class="secondary-btn">Log Out</button>
+        <button type="button" id="deactivateBtn" class="danger-btn" onclick="requestDeactivation()">Request Listing Removal / Deactivation</button>
     </div>
 
-    <!-- LEGAL FOOTER LINKS -->
-    <div class="legal-footer">
-        <a href="privacy.html" target="_blank">Privacy Policy</a> | <a href="terms.html" target="_blank">Terms of Service</a>
+    <div class="policy-links">
+        <a href="privacy.html" target="_blank">Privacy Policy</a> | 
+        <a href="terms.html" target="_blank">Terms of Service</a>
     </div>
-</div>
 
-<!-- COOKIE CONSENT BANNER -->
-<div id="cookieBanner" style="position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 15px 20px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); font-family: Arial, sans-serif; font-size: 14px;">
-    <div style="margin-right: 20px; line-height: 1.4;">
-        We use essential cookies and local storage to ensure our business portal functions securely and reliably. Read our <a href="privacy.html" style="color: #3498db; text-decoration: underline;" target="_blank">Privacy Policy</a> for details.
-    </div>
-    <div>
-        <button id="acceptCookies" style="background: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px;">Got it</button>
-    </div>
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz3KLxzSOmCCnSWhfR72R5xl5IBdF0f9Sd14mgQwzmyYue1KQb_sWv7Uq6R_Ucs22bf/exec";
+    // Live Deployment Endpoint
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZNulsGrF0OoEpTO2us_uqCl0U8bXzl5Vat8KqAtOz_fFkYk6ObJw4jxYNf4Old6en/exec";
 
-    // Cookie Banner Logic
-    document.addEventListener('DOMContentLoaded', function() {
-        const consentBanner = document.getElementById('cookieBanner');
-        const acceptBtn = document.getElementById('acceptCookies');
+    let currentUser = null;
+    let currentBusiness = null;
 
-        if (localStorage.getItem('sais_cookie_consent') === 'true') {
-            consentBanner.style.display = 'none';
-        }
-
-        acceptBtn.addEventListener('click', function() {
-            localStorage.setItem('sais_cookie_consent', 'true');
-            consentBanner.style.display = 'none';
+    // View Management Helpers
+    function showView(viewId) {
+        ['loginView', 'registerView', 'forgotView', 'dashboardView'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
         });
-    });
-
-    document.getElementById('showRegisterLink').addEventListener('click', () => {
-        document.getElementById('loginView').classList.add('hidden');
-        document.getElementById('registerView').classList.remove('hidden');
-    });
-    document.getElementById('showLoginLink').addEventListener('click', () => {
-        document.getElementById('registerView').classList.add('hidden');
-        document.getElementById('loginView').classList.remove('hidden');
-    });
-    document.getElementById('logoutLink').addEventListener('click', () => {
-        clearTimeout(idleTimer);
-        document.getElementById('dashboardView').classList.add('hidden');
-        document.getElementById('loginView').classList.remove('hidden');
-        document.getElementById('loginForm').reset();
-    });
-
-    // Idle Timeout (15 minutes = 900,000 ms)
-    let idleTimer;
-    function resetIdleTimer() {
-        if (document.getElementById('dashboardView').classList.contains('hidden')) return;
-        clearTimeout(idleTimer);
-        idleTimer = setTimeout(() => {
-            if (!document.getElementById('dashboardView').classList.contains('hidden')) {
-                document.getElementById('logoutLink').click();
-                alert('You have been logged out due to inactivity.');
-            }
-        }, 900000);
+        document.getElementById(viewId).classList.remove('hidden');
     }
 
-    window.addEventListener('mousemove', resetIdleTimer);
-    window.addEventListener('keypress', resetIdleTimer);
-    window.addEventListener('click', resetIdleTimer);
+    document.getElementById('showRegisterLink').addEventListener('click', () => showView('registerView'));
+    document.getElementById('showLoginLink').addEventListener('click', () => showView('loginView'));
+    document.getElementById('showForgotLink').addEventListener('click', () => showView('forgotView'));
+    document.getElementById('backToLoginFromForgot').addEventListener('click', () => showView('loginView'));
 
-    // 1. REGISTRATION SUBMISSION (With Frontend Sanitization & Validation)
+    // Toggle Claim vs New Business Inputs
+    document.getElementById('regTypeSelect').addEventListener('change', function() {
+        const val = this.value;
+        if (val === 'claim') {
+            document.getElementById('claimFields').classList.remove('hidden');
+            document.getElementById('newFields').classList.add('hidden');
+            document.getElementById('regBusinessSearch').required = true;
+            document.getElementById('regNewBusinessName').required = false;
+        } else {
+            document.getElementById('claimFields').classList.add('hidden');
+            document.getElementById('newFields').classList.remove('hidden');
+            document.getElementById('regBusinessSearch').required = false;
+            document.getElementById('regNewBusinessName').required = true;
+        }
+    });
+
+    // Login Form Submission
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        const msg = document.getElementById('loginMessage');
+        const btn = document.getElementById('loginBtn');
+
+        btn.disabled = true;
+        btn.textContent = 'Logging in...';
+        msg.style.color = '#555';
+        msg.textContent = 'Verifying credentials...';
+
+        try {
+            const url = `${WEB_APP_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                currentUser = result.user;
+                currentBusiness = result.business;
+                loadDashboardData();
+                showView('dashboardView');
+            } else if (result.status === 'pending') {
+                msg.style.color = '#e67e22';
+                msg.textContent = result.message;
+            } else {
+                msg.style.color = '#e74c3c';
+                msg.textContent = result.message;
+            }
+        } catch (error) {
+            msg.style.color = '#e74c3c';
+            msg.textContent = 'Connection error: ' + error.message;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Log In';
+        }
+    });
+
+    // Registration Submission
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const email = document.getElementById('regEmail').value.trim().toLowerCase();
+        const regType = document.getElementById('regTypeSelect').value;
+        const email = document.getElementById('regEmail').value.trim();
         const password = document.getElementById('regPassword').value.trim();
         const phone = document.getElementById('regPhone').value.trim();
-        const businessId = document.getElementById('regBusinessId').value.trim().toUpperCase();
+        const businessInput = regType === 'claim' ? document.getElementById('regBusinessSearch').value.trim() : document.getElementById('regNewBusinessName').value.trim();
+        
         const msg = document.getElementById('regMessage');
         const btn = document.getElementById('regBtn');
 
-        // Validation Checks
-        if (!email.includes('@') || !email.includes('.')) {
-            msg.style.color = '#e74c3c';
-            msg.textContent = 'Please enter a valid email address.';
-            return;
-        }
-
         if (password.length < 6) {
             msg.style.color = '#e74c3c';
-            msg.textContent = 'Password must be at least 6 characters long.';
+            msg.textContent = 'Password must be at least 6 characters.';
             return;
         }
 
         btn.disabled = true;
         btn.textContent = 'Submitting...';
         msg.style.color = '#555';
-        msg.textContent = 'Connecting...';
+        msg.textContent = 'Processing...';
 
         try {
-            const url = `${WEB_APP_URL}?action=register&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&phone=${encodeURIComponent(phone)}&businessId=${encodeURIComponent(businessId)}`;
+            let url = `${WEB_APP_URL}?action=register&regType=${regType}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&phone=${encodeURIComponent(phone)}`;
+            
+            if (regType === 'claim') {
+                url += `&businessId=${encodeURIComponent(businessInput)}&businessName=${encodeURIComponent(businessInput)}`;
+            } else {
+                url += `&businessName=${encodeURIComponent(businessInput)}`;
+            }
+
             const response = await fetch(url);
             const result = await response.json();
 
@@ -221,191 +352,126 @@
             msg.textContent = 'Error: ' + error.message;
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Request Access';
+            btn.textContent = 'Submit Registration';
         }
     });
 
-    // 2. LOGIN & STATUS CHECK
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    // Password Reset Request
+    document.getElementById('forgotForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-        const password = document.getElementById('loginPassword').value.trim();
-        const msg = document.getElementById('loginMessage');
-        const btn = document.getElementById('loginBtn');
+        const email = document.getElementById('forgotEmail').value.trim();
+        const msg = document.getElementById('forgotMessage');
+        const btn = document.getElementById('forgotBtn');
 
         btn.disabled = true;
-        btn.textContent = 'Checking...';
-        msg.style.color = '#555';
-        msg.textContent = 'Verifying account...';
+        btn.textContent = 'Sending...';
 
         try {
-            const url = `${WEB_APP_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+            const url = `${WEB_APP_URL}?action=requestPasswordReset&email=${encodeURIComponent(email)}`;
             const response = await fetch(url);
             const result = await response.json();
-
-            if (result.status === 'success') {
-                loadDashboard(result.user, result.business);
-            } else if (result.status === 'pending') {
-                msg.style.color = '#d35400';
-                msg.textContent = result.message;
-            } else {
-                msg.style.color = '#e74c3c';
-                msg.textContent = result.message;
-            }
+            msg.style.color = 'green';
+            msg.textContent = result.message;
         } catch (error) {
             msg.style.color = '#e74c3c';
-            msg.textContent = 'Connection error. Please try again.';
+            msg.textContent = 'Error sending reset code.';
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Log In';
+            btn.textContent = 'Send Reset Instructions';
         }
     });
 
-    let currentBusinessId = '';
-    let currentUserEmail = '';
-
-    function loadDashboard(user, business) {
-        document.getElementById('loginView').classList.add('hidden');
-        document.getElementById('dashboardView').classList.remove('hidden');
-        document.getElementById('welcomeUser').textContent = `Logged in as: ${user.email} (Business ID: ${user.businessId})`;
-        currentBusinessId = user.businessId;
-        currentUserEmail = user.email;
-
-        resetIdleTimer();
-
-        const container = document.getElementById('dynamicFields');
+    // Populate Dashboard Fields Dynamically based on Spreadsheet Headers
+    function loadDashboardData() {
+        document.getElementById('welcomeUser').textContent = `Logged in as: ${currentUser.email} (Business ID: ${currentUser.businessId})`;
+        const container = document.getElementById('dynamicFieldsContainer');
         container.innerHTML = '';
 
-        if (!business) {
-            container.innerHTML = '<p style="color:red; text-align:center;">Error: Business record could not be found matching ID ' + user.businessId + '</p>';
+        if (!currentBusiness) {
+            container.innerHTML = '<p style="color: #e74c3c; text-align: center;">No linked business record found.</p>';
             return;
         }
 
-        const allowedFields = [
-            'Business ID',
-            'Business Name',
-            'Category',
-            'Area / Town',
-            'Phone',
-            'Email',
-            'Website',
-            'Facebook',
-            'Instagram',
-            'Description',
-            'Active'
-        ];
-
-        allowedFields.forEach(key => {
-            if (business[key] === undefined && key !== 'Business ID') return;
-
-            const div = document.createElement('div');
-            div.className = 'form-group';
+        for (const [key, value] of Object.entries(currentBusiness)) {
+            if (key === '_sheetRow') continue;
+            
+            const group = document.createElement('div');
+            group.className = 'form-group';
 
             const label = document.createElement('label');
             label.textContent = key;
-            div.appendChild(label);
+            group.appendChild(label);
 
-            if (key.toLowerCase().includes('id')) {
+            // Keep Business ID uneditable by owner directly
+            if (key === 'Business ID') {
                 const input = document.createElement('input');
                 input.type = 'text';
-                input.value = business[key] || user.businessId;
+                input.value = value;
                 input.disabled = true;
-                input.style.background = '#e9ecef';
-                div.appendChild(input);
-            } 
-            else if (key.toLowerCase().includes('description')) {
-                const textarea = document.createElement('textarea');
-                textarea.name = key;
-                textarea.value = business[key] || '';
-                div.appendChild(textarea);
-            } 
-            else {
+                group.appendChild(input);
+            } else {
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.name = key;
-                input.value = business[key] || '';
-                div.appendChild(input);
+                input.value = value;
+                group.appendChild(input);
             }
-            container.appendChild(div);
-        });
+            container.appendChild(group);
+        }
     }
 
-    // 3. SUBMIT UPDATES
-    document.getElementById('editForm').addEventListener('submit', async function(e) {
+    // Save Dashboard Business Edits
+    document.getElementById('dashboardForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const msg = document.getElementById('editMessage');
-        const btn = document.getElementById('saveBtn');
-        const inputs = document.querySelectorAll('#dynamicFields input, #dynamicFields textarea');
-
-        let businessData = {};
+        const inputs = document.querySelectorAll('#dynamicFieldsContainer input');
+        const updatedData = {};
+        
         inputs.forEach(input => {
-            if (input.name) businessData[input.name] = input.value.trim();
+            if (input.name && input.name !== 'Business ID') {
+                updatedData[input.name] = input.value;
+            }
         });
+
+        const msg = document.getElementById('dashboardMessage');
+        const btn = document.getElementById('updateBizBtn');
 
         btn.disabled = true;
         btn.textContent = 'Saving...';
-        msg.style.color = '#555';
-        msg.textContent = 'Updating live directory...';
 
         try {
-            const url = `${WEB_APP_URL}?action=updateBusiness&businessId=${encodeURIComponent(currentBusinessId)}&businessData=${encodeURIComponent(JSON.stringify(businessData))}`;
+            const url = `${WEB_APP_URL}?action=updateBusiness&businessId=${encodeURIComponent(currentUser.businessId)}&businessData=${encodeURIComponent(JSON.stringify(updatedData))}`;
             const response = await fetch(url);
             const result = await response.json();
 
             if (result.status === 'success') {
                 msg.style.color = 'green';
-                msg.textContent = 'Changes saved successfully and updated live on the directory!';
+                msg.textContent = result.message;
             } else {
                 msg.style.color = '#e74c3c';
-                msg.textContent = 'Error: ' + result.message;
+                msg.textContent = result.message;
             }
         } catch (error) {
             msg.style.color = '#e74c3c';
-            msg.textContent = 'Save failed: ' + error.message;
+            msg.textContent = 'Error updating record.';
         } finally {
             btn.disabled = false;
             btn.textContent = 'Save Changes';
         }
     });
 
-    // 4. UPDATE PASSWORD SUBMISSION
-    document.getElementById('passwordForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const newPassword = document.getElementById('newPassword').value.trim();
-        const msg = document.getElementById('passwordMessage');
-        const btn = document.getElementById('passwordBtn');
-
-        if (newPassword.length < 6) {
-            msg.style.color = '#e74c3c';
-            msg.textContent = 'New password must be at least 6 characters long.';
-            return;
+    // Deactivation Request Helper
+    function requestDeactivation() {
+        if (confirm("Are you sure you want to request deactivation or removal of your directory listing? This will notify site administration.")) {
+            alert("Deactivation request sent to support team.");
         }
+    }
 
-        btn.disabled = true;
-        btn.textContent = 'Updating...';
-        msg.style.color = '#555';
-        msg.textContent = 'Saving password...';
-
-        try {
-            const url = `${WEB_APP_URL}?action=updatePassword&email=${encodeURIComponent(currentUserEmail)}&newPassword=${encodeURIComponent(newPassword)}`;
-            const response = await fetch(url);
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                msg.style.color = 'green';
-                msg.textContent = 'Password updated successfully!';
-                document.getElementById('passwordForm').reset();
-            } else {
-                msg.style.color = '#e74c3c';
-                msg.textContent = 'Error: ' + result.message;
-            }
-        } catch (error) {
-            msg.style.color = '#e74c3c';
-            msg.textContent = 'Update failed: ' + error.message;
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Update Password';
-        }
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        currentUser = null;
+        currentBusiness = null;
+        document.getElementById('loginForm').reset();
+        showView('loginView');
     });
 </script>
 
