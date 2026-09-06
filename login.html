@@ -24,6 +24,7 @@
 <body>
 
 <div class="card">
+    <!-- LOGIN VIEW -->
     <div id="loginView">
         <h2>Business Portal Login</h2>
         <form id="loginForm">
@@ -39,6 +40,7 @@
         </div>
     </div>
 
+    <!-- REGISTER VIEW -->
     <div id="registerView" class="hidden">
         <h2>Request Business Access</h2>
         <form id="signupForm">
@@ -62,6 +64,7 @@
         </div>
     </div>
 
+    <!-- DASHBOARD VIEW (Shown when approved) -->
     <div id="dashboardView" class="hidden">
         <h2>Edit Your Business Listing</h2>
         <p id="welcomeUser" style="text-align: center; color: #666; font-size: 13px; margin-bottom: 20px;"></p>
@@ -77,7 +80,7 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxekvbIPAWrk1rCiD8BmZWR_8q0Dik1imzdsKQIVxd1Du9D5ZkD-44iE1oXwN6sDIo3/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzzmMJGbOf3kjNmkKibwAD5cKgn0HnpTrsl1GKAm13UkSU4C_ykm7TEr3kK6oGOeS3l/exec";
 
     // Navigation toggles
     document.getElementById('showRegisterLink').addEventListener('click', () => {
@@ -188,9 +191,7 @@
             return;
         }
 
-        // Loop through each column of the business data and create inputs
         for (let key in business) {
-            // Keep system tracking keys hidden or read-only
             if (key === '_sheetRow') continue;
 
             const div = document.createElement('div');
@@ -201,7 +202,6 @@
             div.appendChild(label);
 
             if (key.toLowerCase().includes('id')) {
-                // Keep Business ID read-only
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.value = business[key];
