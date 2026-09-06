@@ -201,22 +201,37 @@
                 <input type="text" id="regBusinessSearch" placeholder="e.g., Somerset Pet Business or SAIS-1" required>
             </div>
 
-            <!-- New Business Dynamic Fields -->
+            <!-- New Business Dynamic Fields (Restricted List) -->
             <div id="newFields" class="form-group hidden">
-                <label for="regNewBusinessName">New Business Name</label>
+                <label for="regNewBusinessName">Business Name</label>
                 <input type="text" id="regNewBusinessName" placeholder="Enter your business name">
 
-                <label for="regNewCategory" style="margin-top: 10px;">Business Category / Services</label>
-                <input type="text" id="regNewCategory" placeholder="e.g., Dog Grooming, Veterinary, Pet Sitting">
+                <label for="regNewCategory" style="margin-top: 10px;">Category</label>
+                <input type="text" id="regNewCategory" placeholder="e.g., Dog Grooming, Veterinary">
 
                 <label for="regNewTown" style="margin-top: 10px;">Area / Town</label>
                 <input type="text" id="regNewTown" placeholder="e.g., Taunton, Somerset">
 
-                <label for="regNewWebsite" style="margin-top: 10px;">Website or Social Media Link</label>
+                <label for="regNewAddress" style="margin-top: 10px;">Address</label>
+                <input type="text" id="regNewAddress" placeholder="Street address or location">
+
+                <label for="regNewPhone" style="margin-top: 10px;">Phone</label>
+                <input type="tel" id="regNewPhone" placeholder="Contact phone number">
+
+                <label for="regNewEmail" style="margin-top: 10px;">Email</label>
+                <input type="email" id="regNewEmail" placeholder="Business public email">
+
+                <label for="regNewWebsite" style="margin-top: 10px;">Website</label>
                 <input type="url" id="regNewWebsite" placeholder="https://www.yourbusiness.com">
 
-                <label for="regNewDescription" style="margin-top: 10px;">Brief Description</label>
-                <textarea id="regNewDescription" placeholder="Tell us about your animal services..."></textarea>
+                <label for="regNewFacebook" style="margin-top: 10px;">Facebook</label>
+                <input type="url" id="regNewFacebook" placeholder="Facebook page URL">
+
+                <label for="regNewInstagram" style="margin-top: 10px;">Instagram</label>
+                <input type="url" id="regNewInstagram" placeholder="Instagram profile URL">
+
+                <label for="regNewDescription" style="margin-top: 10px;">Description</label>
+                <textarea id="regNewDescription" placeholder="Tell us about your services..."></textarea>
             </div>
 
             <button type="submit" id="regBtn">Submit Free Registration</button>
@@ -266,11 +281,24 @@
 </div>
 
 <script>
-    // Live Deployment Endpoint
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyXr2Ie886_dZMouYBOPRP7SLQMsQJUxNOhTZ25di7tIzLVcy-okpPVMvIJQL6G6ZKL/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwl2XzI0HGvzVj5cXSPuZmTQ-8fB9w328OZ5IsMEp-eRLr-Qr_2mbD81tCKZrt1Uxoa/exec";
 
     let currentUser = null;
     let currentBusiness = null;
+
+    // Allowed fields whitelist matching exact column titles
+    const ALLOWED_FIELDS = [
+        "Business Name",
+        "Category",
+        "Area / Town",
+        "Address",
+        "Phone",
+        "Email",
+        "Website",
+        "Facebook",
+        "Instagram",
+        "Description"
+    ];
 
     function showView(viewId) {
         ['loginView', 'registerView', 'forgotView', 'dashboardView'].forEach(id => {
@@ -284,7 +312,6 @@
     document.getElementById('showForgotLink').addEventListener('click', () => showView('forgotView'));
     document.getElementById('backToLoginFromForgot').addEventListener('click', () => showView('loginView'));
 
-    // Toggle Claim vs New Business Inputs
     document.getElementById('regTypeSelect').addEventListener('change', function() {
         const val = this.value;
         if (val === 'claim') {
@@ -300,7 +327,6 @@
         }
     });
 
-    // Login Form Submission
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value.trim();
@@ -339,7 +365,6 @@
         }
     });
 
-    // Registration Submission
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const regType = document.getElementById('regTypeSelect').value;
@@ -368,17 +393,16 @@
                 const businessInput = document.getElementById('regBusinessSearch').value.trim();
                 url += `&businessId=${encodeURIComponent(businessInput)}&businessName=${encodeURIComponent(businessInput)}`;
             } else {
-                const bizName = document.getElementById('regNewBusinessName').value.trim();
-                const category = document.getElementById('regNewCategory').value.trim();
-                const town = document.getElementById('regNewTown').value.trim();
-                const website = document.getElementById('regNewWebsite').value.trim();
-                const description = document.getElementById('regNewDescription').value.trim();
-
-                url += `&businessName=${encodeURIComponent(bizName)}` +
-                       `&Category=${encodeURIComponent(category)}` +
-                       `&Town=${encodeURIComponent(town)}` +
-                       `&Website=${encodeURIComponent(website)}` +
-                       `&Description=${encodeURIComponent(description)}`;
+                url += `&businessName=${encodeURIComponent(document.getElementById('regNewBusinessName').value.trim())}` +
+                       `&Category=${encodeURIComponent(document.getElementById('regNewCategory').value.trim())}` +
+                       `&Town=${encodeURIComponent(document.getElementById('regNewTown').value.trim())}` +
+                       `&Address=${encodeURIComponent(document.getElementById('regNewAddress').value.trim())}` +
+                       `&Phone=${encodeURIComponent(document.getElementById('regNewPhone').value.trim())}` +
+                       `&Email=${encodeURIComponent(document.getElementById('regNewEmail').value.trim())}` +
+                       `&Website=${encodeURIComponent(document.getElementById('regNewWebsite').value.trim())}` +
+                       `&Facebook=${encodeURIComponent(document.getElementById('regNewFacebook').value.trim())}` +
+                       `&Instagram=${encodeURIComponent(document.getElementById('regNewInstagram').value.trim())}` +
+                       `&Description=${encodeURIComponent(document.getElementById('regNewDescription').value.trim())}`;
             }
 
             const response = await fetch(url);
@@ -401,7 +425,6 @@
         }
     });
 
-    // Password Reset Request
     document.getElementById('forgotForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('forgotEmail').value.trim();
@@ -436,41 +459,51 @@
             return;
         }
 
-        for (const [key, value] of Object.entries(currentBusiness)) {
-            if (key === '_sheetRow') continue;
-            
+        // Always show Business ID first (read-only)
+        const idGroup = document.createElement('div');
+        idGroup.className = 'form-group';
+        const idLabel = document.createElement('label');
+        idLabel.textContent = 'Business ID';
+        const idInput = document.createElement('input');
+        idInput.type = 'text';
+        idInput.value = currentBusiness['Business ID'] || currentUser.businessId;
+        idInput.disabled = true;
+        idGroup.appendChild(idLabel);
+        idGroup.appendChild(idInput);
+        container.appendChild(idGroup);
+
+        // Render only the whitelisted fields
+        ALLOWED_FIELDS.forEach(fieldKey => {
             const group = document.createElement('div');
             group.className = 'form-group';
 
             const label = document.createElement('label');
-            label.textContent = key;
+            label.textContent = fieldKey;
             group.appendChild(label);
 
-            if (key === 'Business ID') {
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = value;
-                input.disabled = true;
-                group.appendChild(input);
+            if (fieldKey.toLowerCase().includes('description')) {
+                const textarea = document.createElement('textarea');
+                textarea.name = fieldKey;
+                textarea.value = currentBusiness[fieldKey] || '';
+                group.appendChild(textarea);
             } else {
                 const input = document.createElement('input');
-                input.type = 'text';
-                input.name = key;
-                input.value = value;
+                input.type = fieldKey.toLowerCase().includes('email') ? 'email' : (fieldKey.toLowerCase().includes('website') || fieldKey.toLowerCase().includes('facebook') || fieldKey.toLowerCase().includes('instagram') ? 'url' : 'text');
+                input.name = fieldKey;
+                input.value = currentBusiness[fieldKey] || '';
                 group.appendChild(input);
             }
             container.appendChild(group);
-        }
+        });
     }
 
-    // Save Dashboard Business Edits
     document.getElementById('dashboardForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const inputs = document.querySelectorAll('#dynamicFieldsContainer input');
+        const inputs = document.querySelectorAll('#dynamicFieldsContainer input, #dynamicFieldsContainer textarea');
         const updatedData = {};
         
         inputs.forEach(input => {
-            if (input.name && input.name !== 'Business ID') {
+            if (input.name && ALLOWED_FIELDS.includes(input.name)) {
                 updatedData[input.name] = input.value;
             }
         });
@@ -502,9 +535,27 @@
         }
     });
 
-    function requestDeactivation() {
-        if (confirm("Are you sure you want to request deactivation or removal of your directory listing? This will notify site administration.")) {
-            alert("Deactivation request sent to support team.");
+    async function requestDeactivation() {
+        if (!confirm("Are you sure you want to request deactivation or removal of your directory listing? This will notify site administration.")) {
+            return;
+        }
+
+        const bizName = currentBusiness ? (currentBusiness['Business Name'] || 'Unknown') : 'Unknown';
+        const bizId = currentUser ? currentUser.businessId : 'Unknown';
+        const userEmail = currentUser ? currentUser.email : '';
+
+        try {
+            const url = `${WEB_APP_URL}?action=requestDeactivation&businessId=${encodeURIComponent(bizId)}&businessName=${encodeURIComponent(bizName)}&email=${encodeURIComponent(userEmail)}`;
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                alert("Deactivation request successfully sent to support team.");
+            } else {
+                alert("Failed to send request: " + result.message);
+            }
+        } catch (error) {
+            alert("Connection error while requesting deactivation.");
         }
     }
 
