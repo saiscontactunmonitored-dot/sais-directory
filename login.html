@@ -205,6 +205,18 @@
             <div id="newFields" class="form-group hidden">
                 <label for="regNewBusinessName">New Business Name</label>
                 <input type="text" id="regNewBusinessName" placeholder="Enter your business name">
+
+                <label for="regNewCategory" style="margin-top: 10px;">Business Category / Services</label>
+                <input type="text" id="regNewCategory" placeholder="e.g., Dog Grooming, Veterinary, Pet Sitting">
+
+                <label for="regNewTown" style="margin-top: 10px;">Town / Area</label>
+                <input type="text" id="regNewTown" placeholder="e.g., Taunton, Somerset">
+
+                <label for="regNewWebsite" style="margin-top: 10px;">Website or Social Media Link</label>
+                <input type="url" id="regNewWebsite" placeholder="https://www.yourbusiness.com">
+
+                <label for="regNewDescription" style="margin-top: 10px;">Brief Description</label>
+                <textarea id="regNewDescription" placeholder="Tell us about your animal services..."></textarea>
             </div>
 
             <button type="submit" id="regBtn">Submit Free Registration</button>
@@ -334,7 +346,6 @@
         const email = document.getElementById('regEmail').value.trim();
         const password = document.getElementById('regPassword').value.trim();
         const phone = document.getElementById('regPhone').value.trim();
-        const businessInput = regType === 'claim' ? document.getElementById('regBusinessSearch').value.trim() : document.getElementById('regNewBusinessName').value.trim();
         
         const msg = document.getElementById('regMessage');
         const btn = document.getElementById('regBtn');
@@ -348,15 +359,26 @@
         btn.disabled = true;
         btn.textContent = 'Submitting...';
         msg.style.color = '#555';
-        msg.textContent = 'Processing...';
+        msg.textContent = 'Processing registration...';
 
         try {
             let url = `${WEB_APP_URL}?action=register&regType=${regType}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&phone=${encodeURIComponent(phone)}`;
             
             if (regType === 'claim') {
+                const businessInput = document.getElementById('regBusinessSearch').value.trim();
                 url += `&businessId=${encodeURIComponent(businessInput)}&businessName=${encodeURIComponent(businessInput)}`;
             } else {
-                url += `&businessName=${encodeURIComponent(businessInput)}`;
+                const bizName = document.getElementById('regNewBusinessName').value.trim();
+                const category = document.getElementById('regNewCategory').value.trim();
+                const town = document.getElementById('regNewTown').value.trim();
+                const website = document.getElementById('regNewWebsite').value.trim();
+                const description = document.getElementById('regNewDescription').value.trim();
+
+                url += `&businessName=${encodeURIComponent(bizName)}` +
+                       `&Category=${encodeURIComponent(category)}` +
+                       `&Town=${encodeURIComponent(town)}` +
+                       `&Website=${encodeURIComponent(website)}` +
+                       `&Description=${encodeURIComponent(description)}`;
             }
 
             const response = await fetch(url);
