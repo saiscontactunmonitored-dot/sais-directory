@@ -315,6 +315,24 @@
             text-decoration: underline;
         }
 
+        .back-home {
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .back-home a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 12px;
+            transition: var(--transition);
+        }
+
+        .back-home a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
         .policy-links {
             margin-top: 24px;
             text-align: center;
@@ -387,7 +405,7 @@
         </div>
         <div class="support-box">
             Encountering any issues?<br>
-            <a href="mailto:info@somersetanimalinformationservices.com">info@</a>
+            <a href="mailto:info@somersetanimalinformationservices.com">info@somersetanimalinformationservices.com</a>
         </div>
     </div>
 
@@ -417,6 +435,9 @@
             <div class="nav-links">
                 <p>Need a business account? <a id="showRegisterLink">Register or Claim Listing</a></p>
                 <p><a id="showForgotLink">Forgot Password?</a></p>
+            </div>
+            <div class="back-home">
+                <a href="index.html" target="_top">&larr; Back to Homepage</a>
             </div>
         </div>
 
@@ -488,6 +509,9 @@
             <div class="nav-links">
                 <p>Already registered? <a id="showLoginLink">Back to Login</a></p>
             </div>
+            <div class="back-home">
+                <a href="index.html" target="_top">&larr; Back to Homepage</a>
+            </div>
         </div>
 
         <!-- FORGOT PASSWORD VIEW -->
@@ -504,6 +528,9 @@
             <div class="nav-links">
                 <p><a id="backToLoginFromForgot">Back to Login</a></p>
             </div>
+            <div class="back-home">
+                <a href="index.html" target="_top">&larr; Back to Homepage</a>
+            </div>
         </div>
 
         <!-- DASHBOARD VIEW -->
@@ -519,6 +546,10 @@
 
             <button type="button" id="logoutBtn" class="secondary-btn">Log Out</button>
             <button type="button" id="deactivateBtn" class="danger-btn" onclick="requestDeactivation()">Request Listing Removal / Deactivation</button>
+            
+            <div class="back-home">
+                <a href="index.html" target="_top">&larr; Back to Homepage</a>
+            </div>
         </div>
 
         <div class="policy-links">
@@ -531,7 +562,7 @@
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyFjoMUErvU-WySAPtwL33MNYc8uxaoz2GOoCV6n8rRV2iiDwHssMDDV2cGABCuoeGK/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwl2XzI0HGvzVj5cXSPuZmTQ-8fB9w328OZ5IsMEp-eRLr-Qr_2mbD81tCKZrt1Uxoa/exec";
 
     let currentUser = null;
     let currentBusiness = null;
@@ -793,8 +824,9 @@
 
         try {
             const url = `${WEB_APP_URL}?action=requestDeactivation&businessId=${encodeURIComponent(bizId)}&businessName=${encodeURIComponent(bizName)}&email=${encodeURIComponent(userEmail)}`;
-            const response = await fetch(url);
-            const result = await response.json();
+            const response = await urlFetch(url); // standard fetch handling
+            const responseObj = await fetch(url);
+            const result = await responseObj.json();
 
             if (result.status === 'success') {
                 alert("Deactivation request successfully sent to support team.");
