@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en-GB">
+
 <head>
 
   <meta charset="utf-8">
@@ -13,7 +14,7 @@
 
   <meta
     name="description"
-    content="Rescue 2 Home is listed in the Somerset Animal Business Directory. Reliable drop-in care for every pet,whatever their temperament."
+    content="Rescue 2 Home in Somerset, Somerset. Reliable drop-in care for every pet,whatever their temperament."
   >
 
   <meta
@@ -26,7 +27,12 @@
     href="https://directory.somersetanimalinformationservices.com/business/sais-0215-rescue-2-home/"
   >
 
-  <!-- SAIS Branding -->
+  <meta
+    name="theme-color"
+    content="#c82333"
+  >
+
+  <!-- SAIS favicon -->
 
   <link
     rel="icon"
@@ -43,7 +49,7 @@
 
   <meta
     property="og:type"
-    content="business.business"
+    content="website"
   >
 
   <meta
@@ -69,6 +75,11 @@
   <meta
     property="og:image"
     content="https://directory.somersetanimalinformationservices.com/directorybanner.png"
+  >
+
+  <meta
+    property="og:image:alt"
+    content="Rescue 2 Home"
   >
 
   <meta
@@ -116,23 +127,19 @@
   "@type": "LocalBusiness",
   "name": "Rescue 2 Home",
   "url": "https://directory.somersetanimalinformationservices.com/business/sais-0215-rescue-2-home/",
-  "areaServed": {
-    "@type": "AdministrativeArea",
-    "name": "Somerset"
-  },
   "description": "Reliable drop-in care for every pet,whatever their temperament.",
   "category": "Pet Drop in",
-  "addressLocality": "Somerset",
   "telephone": "07933 325465",
   "email": "rescue2homeanimalsupport@gmail.com",
-  "sameAs": [
-    "https://rescue2home.animalplacesinsomerset.com"
-  ],
   "address": {
     "@type": "PostalAddress",
-    "addressLocality": "Somerset",
     "addressRegion": "Somerset",
-    "addressCountry": "GB"
+    "addressCountry": "GB",
+    "addressLocality": "Somerset"
+  },
+  "areaServed": {
+    "@type": "Place",
+    "name": "Somerset"
   }
 }
   </script>
@@ -183,10 +190,6 @@
 
     * {
       box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
     }
 
     body {
@@ -278,6 +281,18 @@
         0 8px 30px rgba(15,23,42,.08);
     }
 
+    .business-image-wrap {
+      margin: -5px -5px 28px;
+    }
+
+    .business-image {
+      display: block;
+      width: 100%;
+      max-height: 360px;
+      object-fit: cover;
+      border-radius: 14px;
+    }
+
     .eyebrow {
       display: inline-block;
       color: var(--brand-red);
@@ -302,16 +317,28 @@
       margin-bottom: 25px;
     }
 
-    .description-heading {
+    h2 {
       color: var(--navy);
       font-size: 1.05rem;
-      margin: 0 0 8px;
+      margin: 0 0 9px;
     }
 
     .description {
       font-size: 1.04rem;
       white-space: pre-line;
       color: var(--text);
+    }
+
+    .extra-section,
+    .social-section {
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 1px solid var(--border);
+    }
+
+    .extra-section p {
+      margin: 0;
+      white-space: pre-line;
     }
 
     .details {
@@ -368,6 +395,27 @@
 
     .button.secondary:hover {
       background: var(--blue-dark);
+    }
+
+    .social-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .social-link {
+      display: inline-block;
+      color: var(--blue);
+      border: 1px solid var(--border);
+      background: #ffffff;
+      padding: 8px 13px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .social-link:hover {
+      border-color: var(--blue);
     }
 
     .back {
@@ -444,22 +492,26 @@
       href="../../"
       aria-label="Back to Somerset Animal Business Directory"
     >
+
       <img
         class="logo"
         src="../../directorylogo.png"
         alt="Somerset Animal Information Services logo"
       >
+
     </a>
 
     <a
       class="brand"
       href="../../"
     >
+
       Somerset Animal Business Directory
 
       <span class="brand-small">
         Somerset Animal Information Services
       </span>
+
     </a>
 
   </div>
@@ -472,6 +524,7 @@
     class="breadcrumbs"
     aria-label="Breadcrumb"
   >
+
     <a href="../../">
       Somerset Animal Business Directory
     </a>
@@ -483,9 +536,12 @@
     <span>
       Rescue 2 Home
     </span>
+
   </nav>
 
   <article class="card">
+
+    
 
     <div class="eyebrow">
       Pet Drop in
@@ -501,10 +557,7 @@
 
     <section aria-labelledby="about-business">
 
-      <h2
-        id="about-business"
-        class="description-heading"
-      >
+      <h2 id="about-business">
         About Rescue 2 Home
       </h2>
 
@@ -514,12 +567,14 @@
 
     </section>
 
+    
+
     <div class="details">
 
       
             <div class="detail">
               <strong>Telephone</strong>
-              <a href="tel:07933 325465">
+              <a href="tel:07933325465">
                 07933 325465
               </a>
             </div>
@@ -550,6 +605,8 @@
 
     </div>
 
+    
+
     <div class="buttons">
 
       
@@ -564,7 +621,7 @@
             
             <a
               class="button secondary"
-              href="tel:07933 325465"
+              href="tel:07933325465"
             >
               Call 07933 325465
             </a>
@@ -611,4 +668,5 @@
 </footer>
 
 </body>
+
 </html>

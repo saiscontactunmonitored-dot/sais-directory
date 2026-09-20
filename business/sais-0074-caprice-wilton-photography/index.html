@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en-GB">
+
 <head>
 
   <meta charset="utf-8">
@@ -13,7 +14,7 @@
 
   <meta
     name="description"
-    content="Caprice Wilton Photography is listed in the Somerset Animal Business Directory. Dog &amp; animal photography based in Bridgwater. Capturing the personality..."
+    content="Caprice Wilton Photography in Bridgwater, Somerset. Dog &amp; animal photography based in Bridgwater. Capturing the personality and spirit of your pets. dog..."
   >
 
   <meta
@@ -26,7 +27,12 @@
     href="https://directory.somersetanimalinformationservices.com/business/sais-0074-caprice-wilton-photography/"
   >
 
-  <!-- SAIS Branding -->
+  <meta
+    name="theme-color"
+    content="#c82333"
+  >
+
+  <!-- SAIS favicon -->
 
   <link
     rel="icon"
@@ -43,7 +49,7 @@
 
   <meta
     property="og:type"
-    content="business.business"
+    content="website"
   >
 
   <meta
@@ -69,6 +75,11 @@
   <meta
     property="og:image"
     content="https://directory.somersetanimalinformationservices.com/directorybanner.png"
+  >
+
+  <meta
+    property="og:image:alt"
+    content="Caprice Wilton Photography"
   >
 
   <meta
@@ -116,20 +127,22 @@
   "@type": "LocalBusiness",
   "name": "Caprice Wilton Photography",
   "url": "https://directory.somersetanimalinformationservices.com/business/sais-0074-caprice-wilton-photography/",
-  "areaServed": {
-    "@type": "AdministrativeArea",
-    "name": "Somerset"
-  },
   "description": "Dog & animal photography based in Bridgwater. Capturing the personality and spirit of your pets.",
   "category": "Animal Photographers & Artists",
-  "addressLocality": "Bridgwater",
   "email": "Capricewilton@gmail.com",
   "address": {
     "@type": "PostalAddress",
-    "addressLocality": "Bridgwater",
     "addressRegion": "Somerset",
-    "addressCountry": "GB"
-  }
+    "addressCountry": "GB",
+    "addressLocality": "Bridgwater"
+  },
+  "areaServed": {
+    "@type": "Place",
+    "name": "Bridgwater"
+  },
+  "sameAs": [
+    "https://www.facebook.com/CapriceWiltonPhotography"
+  ]
 }
   </script>
 
@@ -179,10 +192,6 @@
 
     * {
       box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
     }
 
     body {
@@ -274,6 +283,18 @@
         0 8px 30px rgba(15,23,42,.08);
     }
 
+    .business-image-wrap {
+      margin: -5px -5px 28px;
+    }
+
+    .business-image {
+      display: block;
+      width: 100%;
+      max-height: 360px;
+      object-fit: cover;
+      border-radius: 14px;
+    }
+
     .eyebrow {
       display: inline-block;
       color: var(--brand-red);
@@ -298,16 +319,28 @@
       margin-bottom: 25px;
     }
 
-    .description-heading {
+    h2 {
       color: var(--navy);
       font-size: 1.05rem;
-      margin: 0 0 8px;
+      margin: 0 0 9px;
     }
 
     .description {
       font-size: 1.04rem;
       white-space: pre-line;
       color: var(--text);
+    }
+
+    .extra-section,
+    .social-section {
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 1px solid var(--border);
+    }
+
+    .extra-section p {
+      margin: 0;
+      white-space: pre-line;
     }
 
     .details {
@@ -364,6 +397,27 @@
 
     .button.secondary:hover {
       background: var(--blue-dark);
+    }
+
+    .social-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .social-link {
+      display: inline-block;
+      color: var(--blue);
+      border: 1px solid var(--border);
+      background: #ffffff;
+      padding: 8px 13px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .social-link:hover {
+      border-color: var(--blue);
     }
 
     .back {
@@ -440,22 +494,26 @@
       href="../../"
       aria-label="Back to Somerset Animal Business Directory"
     >
+
       <img
         class="logo"
         src="../../directorylogo.png"
         alt="Somerset Animal Information Services logo"
       >
+
     </a>
 
     <a
       class="brand"
       href="../../"
     >
+
       Somerset Animal Business Directory
 
       <span class="brand-small">
         Somerset Animal Information Services
       </span>
+
     </a>
 
   </div>
@@ -468,6 +526,7 @@
     class="breadcrumbs"
     aria-label="Breadcrumb"
   >
+
     <a href="../../">
       Somerset Animal Business Directory
     </a>
@@ -479,9 +538,12 @@
     <span>
       Caprice Wilton Photography
     </span>
+
   </nav>
 
   <article class="card">
+
+    
 
     <div class="eyebrow">
       Animal Photographers &amp; Artists
@@ -497,10 +559,7 @@
 
     <section aria-labelledby="about-business">
 
-      <h2
-        id="about-business"
-        class="description-heading"
-      >
+      <h2 id="about-business">
         About Caprice Wilton Photography
       </h2>
 
@@ -509,6 +568,13 @@
       </div>
 
     </section>
+
+    
+        <section class="extra-section">
+          <h2>Services</h2>
+          <p>dog photography, animal photography</p>
+        </section>
+        
 
     <div class="details">
 
@@ -527,6 +593,24 @@
             
 
     </div>
+
+    
+        <section class="social-section">
+          <h2>Find Caprice Wilton Photography online</h2>
+          <div class="social-links">
+            
+            <a
+              class="social-link"
+              href="https://www.facebook.com/CapriceWiltonPhotography"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Facebook
+            </a>
+            
+          </div>
+        </section>
+        
 
     <div class="buttons">
 
@@ -573,4 +657,5 @@
 </footer>
 
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en-GB">
+
 <head>
 
   <meta charset="utf-8">
@@ -26,7 +27,12 @@
     href="https://directory.somersetanimalinformationservices.com/business/sais-0003-positively-understanding-pooches/"
   >
 
-  <!-- SAIS Branding -->
+  <meta
+    name="theme-color"
+    content="#c82333"
+  >
+
+  <!-- SAIS favicon -->
 
   <link
     rel="icon"
@@ -43,7 +49,7 @@
 
   <meta
     property="og:type"
-    content="business.business"
+    content="website"
   >
 
   <meta
@@ -69,6 +75,11 @@
   <meta
     property="og:image"
     content="https://directory.somersetanimalinformationservices.com/directorybanner.png"
+  >
+
+  <meta
+    property="og:image:alt"
+    content="Positively Understanding Pooches"
   >
 
   <meta
@@ -116,22 +127,18 @@
   "@type": "LocalBusiness",
   "name": "Positively Understanding Pooches",
   "url": "https://directory.somersetanimalinformationservices.com/business/sais-0003-positively-understanding-pooches/",
-  "areaServed": {
-    "@type": "AdministrativeArea",
-    "name": "Somerset"
-  },
   "category": "Animal Behaviourists",
-  "addressLocality": "Lydford on Fosse",
   "telephone": "07950729695",
   "email": "contact@pupbehaviour.co.uk",
-  "sameAs": [
-    "http://www.pupbehaviour.co.uk"
-  ],
   "address": {
     "@type": "PostalAddress",
-    "addressLocality": "Lydford on Fosse",
     "addressRegion": "Somerset",
-    "addressCountry": "GB"
+    "addressCountry": "GB",
+    "addressLocality": "Lydford on Fosse"
+  },
+  "areaServed": {
+    "@type": "Place",
+    "name": "Lydford on Fosse"
   }
 }
   </script>
@@ -182,10 +189,6 @@
 
     * {
       box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
     }
 
     body {
@@ -277,6 +280,18 @@
         0 8px 30px rgba(15,23,42,.08);
     }
 
+    .business-image-wrap {
+      margin: -5px -5px 28px;
+    }
+
+    .business-image {
+      display: block;
+      width: 100%;
+      max-height: 360px;
+      object-fit: cover;
+      border-radius: 14px;
+    }
+
     .eyebrow {
       display: inline-block;
       color: var(--brand-red);
@@ -301,16 +316,28 @@
       margin-bottom: 25px;
     }
 
-    .description-heading {
+    h2 {
       color: var(--navy);
       font-size: 1.05rem;
-      margin: 0 0 8px;
+      margin: 0 0 9px;
     }
 
     .description {
       font-size: 1.04rem;
       white-space: pre-line;
       color: var(--text);
+    }
+
+    .extra-section,
+    .social-section {
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 1px solid var(--border);
+    }
+
+    .extra-section p {
+      margin: 0;
+      white-space: pre-line;
     }
 
     .details {
@@ -367,6 +394,27 @@
 
     .button.secondary:hover {
       background: var(--blue-dark);
+    }
+
+    .social-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .social-link {
+      display: inline-block;
+      color: var(--blue);
+      border: 1px solid var(--border);
+      background: #ffffff;
+      padding: 8px 13px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .social-link:hover {
+      border-color: var(--blue);
     }
 
     .back {
@@ -443,22 +491,26 @@
       href="../../"
       aria-label="Back to Somerset Animal Business Directory"
     >
+
       <img
         class="logo"
         src="../../directorylogo.png"
         alt="Somerset Animal Information Services logo"
       >
+
     </a>
 
     <a
       class="brand"
       href="../../"
     >
+
       Somerset Animal Business Directory
 
       <span class="brand-small">
         Somerset Animal Information Services
       </span>
+
     </a>
 
   </div>
@@ -471,6 +523,7 @@
     class="breadcrumbs"
     aria-label="Breadcrumb"
   >
+
     <a href="../../">
       Somerset Animal Business Directory
     </a>
@@ -482,9 +535,12 @@
     <span>
       Positively Understanding Pooches
     </span>
+
   </nav>
 
   <article class="card">
+
+    
 
     <div class="eyebrow">
       Animal Behaviourists
@@ -500,10 +556,7 @@
 
     <section aria-labelledby="about-business">
 
-      <h2
-        id="about-business"
-        class="description-heading"
-      >
+      <h2 id="about-business">
         About Positively Understanding Pooches
       </h2>
 
@@ -512,6 +565,8 @@
       </div>
 
     </section>
+
+    
 
     <div class="details">
 
@@ -548,6 +603,8 @@
             
 
     </div>
+
+    
 
     <div class="buttons">
 
@@ -610,4 +667,5 @@
 </footer>
 
 </body>
+
 </html>
