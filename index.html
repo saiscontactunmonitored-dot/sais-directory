@@ -10,6 +10,7 @@
   <meta name="description" content="Somerset Animal Business Directory is a local online directory connecting pet owners with animal businesses and services across Somerset. Discover trusted local veterinary practices, dog groomers, dog walkers, trainers, behaviourists, pet sitters, boarding services, pet shops, animal therapists, photographers and more. We help Somerset pet owners find useful local animal services while supporting businesses by giving them a place to showcase what they offer. Free business listings are available.">
   <meta name="keywords" content="Somerset animal directory, pet care Somerset, veterinary practices Somerset, animal services TA19, dog groomers, pet sitters">
   <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://directory.somersetanimalinformationservices.com/">
   <meta name="language" content="English">
 
   <!-- PWA Manifest -->
@@ -19,7 +20,7 @@
   <meta name="apple-mobile-web-app-title" content="SAIS Directory">
 
   <!-- Favicon (Round Logo Link - High-Res) -->
-  <link rel="icon" type="image/jpeg" href="./directorylogo.png">
+  <link rel="icon" type="image/png" href="./directorylogo.png">
   <link rel="apple-touch-icon" href="./directorylogo.png">
 
   <!-- Open Graph / Facebook / WhatsApp (Landscape Banner Link - High-Res) -->
@@ -451,6 +452,8 @@
 
     .business-card {
       background: var(--card-bg);
+      color: inherit;
+      text-decoration: none;
       border: 1px solid var(--neutral-200);
       border-radius: var(--radius-md);
       padding: 18px;
@@ -1282,7 +1285,7 @@
   <!-- PWA INSTALL PROMPT POPUP -->
   <div id="pwaInstallBanner" class="pwa-install-banner">
     <div class="pwa-banner-header">
-      <img class="pwa-banner-icon" src="./directorylogo.png" alt="App Logo">
+      <img class="pwa-banner-icon" src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlgAboLIY31LyxC5Llo6f1lgk5tSJOuoTQRee9X2MKW0PJ6o2EAbkIJNKO2IYL1F2P_TZk7fnhl1T2loLml7812rH_4TkCs52dmCZ2Klmp9---yyuhnCL0pyfc-X4bin-Neyr6Lo7JzjRyG=s500" alt="App Logo">
       <div class="pwa-banner-text">
         <h4>Add to Home Screen</h4>
         <p>Did you know you can now add us to your home page for quick, app-like access?</p>
@@ -1351,12 +1354,6 @@
   </footer>
 
   <script>
-    // REPOSITORY IMAGE PATHS
-    // These files live in the same GitHub repository as this index.html.
-    // Keep the filenames exactly as shown: directorylogo.png and directorybanner.png
-    var DIRECTORY_LOGO = './directorylogo.png';
-    var DIRECTORY_BANNER = './directorybanner.png';
-
     // Live Google Apps Script Endpoint URL
     var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwl2XzI0HGvzVj5cXSPuZmTQ-8fB9w328OZ5IsMEp-eRLr-Qr_2mbD81tCKZrt1Uxoa/exec';
 
@@ -1537,9 +1534,24 @@
       ]);
     }
 
-    // Create the permanent shareable URL for a business.
-    // Example:
-    // https://directory.somersetanimalinformationservices.com/?business=SAIS-0213
+    // Legacy shareable URL retained for old links. New cards use crawlable /business/ pages.
+    function slugifyBusinessPart(value) {
+      return String(value || '')
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '') || 'animal-business';
+    }
+
+    function getBusinessPageUrl(b) {
+      var businessId = getBusinessId(b);
+      if (!businessId) return getBusinessUrl(b);
+
+      var slug = slugifyBusinessPart(businessId) + '-' + slugifyBusinessPart(getName(b));
+      return window.location.origin + '/business/' + slug + '/';
+    }
+
     function getBusinessUrl(b) {
       var businessId = getBusinessId(b);
 
@@ -1773,8 +1785,13 @@
       var pageItems = filteredBusinesses.slice(start, end);
 
       pageItems.forEach(function(b) {
-        var card = document.createElement('div');
+        // Use a real crawlable link rather than a JS-only click handler.
+        // This keeps the existing search/filter interface while allowing
+        // search engines to discover each individual business page.
+        var card = document.createElement('a');
         card.className = 'business-card';
+        card.href = getBusinessPageUrl(b);
+        card.setAttribute('aria-label', 'View ' + getName(b) + ' business listing');
 
         var catDiv = document.createElement('div');
         catDiv.className = 'card-category';
@@ -1788,19 +1805,14 @@
         locDiv.className = 'card-location';
         locDiv.textContent = '📍 ' + getLocation(b);
 
-        var btn = document.createElement('button');
+        var btn = document.createElement('span');
         btn.className = 'card-btn';
-        btn.type = 'button';
         btn.textContent = 'View Details →';
 
         card.appendChild(catDiv);
         card.appendChild(titleDiv);
         card.appendChild(locDiv);
         card.appendChild(btn);
-
-        card.addEventListener('click', function() {
-          window.location.href = getBusinessUrl(b);
-        });
 
         directoryGrid.appendChild(card);
       });
@@ -1881,11 +1893,10 @@
       businessModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
 
-      // Remove the business parameter so closing a listing returns to the normal directory URL.
-      var params = new URLSearchParams(window.location.search);
-      if (params.has('business')) {
-        params.delete('business');
-        var cleanUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+      // Keep legacy ?business=SAIS-XXXX links working, but clean the URL
+      // when the legacy modal is closed.
+      if (window.location.search) {
+        var cleanUrl = window.location.pathname + window.location.hash;
         window.history.replaceState({}, document.title, cleanUrl);
       }
     }
