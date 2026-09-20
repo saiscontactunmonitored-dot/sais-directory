@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 SAIS Business Page Generator
 
@@ -9,20 +10,24 @@ Fetches the live SAIS business directory from Google Apps Script and creates:
 for every business with a Business ID.
 
 Also generates:
+
     sitemap.xml
 
 Designed for GitHub Pages and the SAIS directory.
 
 SEO features:
-- Unique page title
-- Unique meta description
-- Canonical URL
+- Unique SEO page titles
+- Unique meta descriptions
+- Canonical URLs
 - Open Graph metadata
 - Twitter/X metadata
 - LocalBusiness structured data
 - BreadcrumbList structured data
+- Real business listing information
 - Business contact information
-- Internal links back to the main directory
+- Social links where available
+- Optional business images
+- Internal links
 - Sitemap generation
 - Safe HTML escaping
 - Stable Business ID based URLs
@@ -64,10 +69,25 @@ BUSINESS_DIR = ROOT / "business"
 
 SITEMAP_FILE = ROOT / "sitemap.xml"
 
+BUSINESS_IMAGE_DIR = ROOT / "images" / "businesses"
+
 
 # ============================================================
 # GENERAL HELPERS
 # ============================================================
+
+def normalise_key(value: str) -> str:
+    """
+    Normalise spreadsheet column names so that small differences
+    in punctuation, spaces and capitalisation do not matter.
+    """
+
+    return re.sub(
+        r"[^a-z0-9]+",
+        "",
+        str(value or "").strip().lower()
+    )
+
 
 def get_val(
     business: dict,
@@ -75,22 +95,30 @@ def get_val(
     default: str = ""
 ) -> str:
     """
-    Return the first non-empty matching field from a business record.
+    Return the first non-empty matching field.
 
-    Matching is case-insensitive so changes in spreadsheet header
-    capitalisation do not break the generator.
+    Matching is tolerant of:
+    - capitalisation
+    - spaces
+    - punctuation
+    - slash characters
     """
 
     if not isinstance(business, dict):
         return default
 
     normalised_business = {
-        str(key).strip().lower(): value
+        normalise_key(key): value
         for key, value in business.items()
     }
 
     for key in keys:
-        value = normalised_business.get(str(key).strip().lower())
+
+        normalised_key = normalise_key(key)
+
+        value = normalised_business.get(
+            normalised_key
+        )
 
         if value is not None and str(value).strip():
             return str(value).strip()
@@ -100,24 +128,34 @@ def get_val(
 
 def esc(value: str) -> str:
     """
-    Safely escape text for HTML attributes and page content.
+    Safely escape text for HTML.
     """
 
-    return html.escape(str(value or ""), quote=True)
+    return html.escape(
+        str(value or ""),
+        quote=True
+    )
 
 
 def normalise_whitespace(value: str) -> str:
     """
-    Clean repeated spaces/newlines without changing the actual wording.
+    Collapse repeated spaces and line breaks.
     """
 
-    return re.sub(r"\s+", " ", str(value or "")).strip()
+    return re.sub(
+        r"\s+",
+        " ",
+        str(value or "")
+    ).strip()
 
 
-def truncate_text(value: str, max_length: int) -> str:
+def truncate_text(
+    value: str,
+    max_length: int
+) -> str:
     """
-    Create a clean meta description without cutting a word in half
-    where possible.
+    Create a clean search/social description without cutting
+    through a word where possible.
     """
 
     value = normalise_whitespace(value)
@@ -125,24 +163,71 @@ def truncate_text(value: str, max_length: int) -> str:
     if len(value) <= max_length:
         return value
 
-    shortened = value[:max_length].rsplit(" ", 1)[0].strip()
+    shortened = value[
+        :max_length
+    ].rsplit(" ", 1)[0].strip()
 
     if not shortened:
         shortened = value[:max_length].strip()
 
-    return shortened.rstrip(".,;:-") + "..."
+    return shortened.rstrip(
+        ".,;:-"
+    ) + "..."
+
+
+def clean_url(value: str) -> str:
+    """
+    Add HTTPS to URLs where the spreadsheet does not contain
+    a protocol.
+    """
+
+    value = str(value or "").strip()
+
+    if not value:
+        return ""
+
+    if re.match(
+        r"^[a-zA-Z][a-zA-Z0-9+.-]*://",
+        value
+    ):
+        return value
+
+    return "https://" + value
+
+
+def clean_phone_for_link(
+    value: str
+) -> str:
+    """
+    Make a telephone value suitable for a tel: link.
+    """
+
+    value = str(value or "").strip()
+
+    if not value:
+        return ""
+
+    if value.startswith("+"):
+        return "+" + re.sub(
+            r"\D",
+            "",
+            value
+        )
+
+    return re.sub(
+        r"\D",
+        "",
+        value
+    )
 
 
 # ============================================================
 # BUSINESS FIELD HELPERS
 # ============================================================
 
-def business_id(business: dict) -> str:
-    """
-    Get the existing SAIS Business ID.
-
-    The generator never invents an ID for an individual page.
-    """
+def business_id(
+    business: dict
+) -> str:
 
     return get_val(
         business,
@@ -156,7 +241,10 @@ def business_id(business: dict) -> str:
     )
 
 
-def business_name(business: dict) -> str:
+def business_name(
+    business: dict
+) -> str:
+
     return get_val(
         business,
         [
@@ -169,21 +257,41 @@ def business_name(business: dict) -> str:
     )
 
 
-def category(business: dict) -> str:
+def category(
+    business: dict
+) -> str:
+
     return get_val(
         business,
         [
             "Category",
             "Category Name",
             "Service Category",
-            "Services Offered",
             "Type",
         ],
         "Animal Service",
     )
 
 
-def location(business: dict) -> str:
+def subcategory(
+    business: dict
+) -> str:
+
+    return get_val(
+        business,
+        [
+            "Subcategory",
+            "Sub Category",
+            "Sub-Category",
+            "Service Type",
+        ],
+    )
+
+
+def location(
+    business: dict
+) -> str:
+
     return get_val(
         business,
         [
@@ -197,7 +305,10 @@ def location(business: dict) -> str:
     )
 
 
-def website(business: dict) -> str:
+def website(
+    business: dict
+) -> str:
+
     value = get_val(
         business,
         [
@@ -209,16 +320,13 @@ def website(business: dict) -> str:
         ],
     )
 
-    if value and not re.match(
-        r"^[a-zA-Z][a-zA-Z0-9+.-]*://",
-        value
-    ):
-        value = "https://" + value
-
-    return value
+    return clean_url(value)
 
 
-def phone(business: dict) -> str:
+def phone(
+    business: dict
+) -> str:
+
     return get_val(
         business,
         [
@@ -231,7 +339,10 @@ def phone(business: dict) -> str:
     )
 
 
-def email_address(business: dict) -> str:
+def email_address(
+    business: dict
+) -> str:
+
     return get_val(
         business,
         [
@@ -242,7 +353,10 @@ def email_address(business: dict) -> str:
     )
 
 
-def address(business: dict) -> str:
+def address(
+    business: dict
+) -> str:
+
     return get_val(
         business,
         [
@@ -253,27 +367,211 @@ def address(business: dict) -> str:
     )
 
 
-def description(business: dict) -> str:
+def postcode(
+    business: dict
+) -> str:
+
+    return get_val(
+        business,
+        [
+            "Postcode",
+            "Postal Code",
+            "Post Code",
+        ],
+    )
+
+
+def description(
+    business: dict
+) -> str:
+
     return get_val(
         business,
         [
             "Description",
-            "Services",
             "About",
-            "Notes",
+            "Business Description",
+            "Listing Description",
             "Details",
         ],
     )
+
+
+def services(
+    business: dict
+) -> str:
+
+    return get_val(
+        business,
+        [
+            "Services",
+            "Services Offered",
+            "Services Provided",
+            "What We Do",
+        ],
+    )
+
+
+def facebook(
+    business: dict
+) -> str:
+
+    return clean_url(
+        get_val(
+            business,
+            [
+                "Facebook",
+                "Facebook URL",
+                "Facebook Page",
+            ],
+        )
+    )
+
+
+def instagram(
+    business: dict
+) -> str:
+
+    return clean_url(
+        get_val(
+            business,
+            [
+                "Instagram",
+                "Instagram URL",
+            ],
+        )
+    )
+
+
+def twitter(
+    business: dict
+) -> str:
+
+    return clean_url(
+        get_val(
+            business,
+            [
+                "Twitter",
+                "Twitter URL",
+                "X",
+                "X URL",
+            ],
+        )
+    )
+
+
+def linkedin(
+    business: dict
+) -> str:
+
+    return clean_url(
+        get_val(
+            business,
+            [
+                "LinkedIn",
+                "LinkedIn URL",
+            ],
+        )
+    )
+
+
+def tiktok(
+    business: dict
+) -> str:
+
+    return clean_url(
+        get_val(
+            business,
+            [
+                "TikTok",
+                "TikTok URL",
+            ],
+        )
+    )
+
+
+def youtube(
+    business: dict
+) -> str:
+
+    return clean_url(
+        get_val(
+            business,
+            [
+                "YouTube",
+                "YouTube URL",
+            ],
+        )
+    )
+
+
+def updated_date(
+    business: dict
+) -> str:
+
+    return get_val(
+        business,
+        [
+            "Last Updated",
+            "Updated",
+            "Updated Date",
+            "Modified",
+            "Modified Date",
+        ],
+    )
+
+
+# ============================================================
+# BUSINESS IMAGE
+# ============================================================
+
+def business_image(
+    business: dict
+) -> str:
+    """
+    If a business image exists in:
+
+        images/businesses/SAIS-XXXX.jpg
+
+    it will automatically be used.
+
+    Otherwise the page simply uses the SAIS directory banner
+    for social sharing.
+    """
+
+    bid = business_id(
+        business
+    )
+
+    if not bid:
+        return ""
+
+    possible_files = [
+        BUSINESS_IMAGE_DIR / f"{bid}.jpg",
+        BUSINESS_IMAGE_DIR / f"{bid}.jpeg",
+        BUSINESS_IMAGE_DIR / f"{bid}.png",
+        BUSINESS_IMAGE_DIR / f"{bid}.webp",
+    ]
+
+    for file_path in possible_files:
+
+        if file_path.exists():
+
+            return (
+                f"{SITE_URL}/images/businesses/"
+                f"{file_path.name}"
+            )
+
+    return ""
 
 
 # ============================================================
 # SLUG / URL HELPERS
 # ============================================================
 
-def slugify(value: str) -> str:
-    """
-    Convert business information into a clean URL slug.
-    """
+def slugify(
+    value: str
+) -> str:
 
     value = unicodedata.normalize(
         "NFKD",
@@ -298,18 +596,17 @@ def slugify(value: str) -> str:
     return value or "business"
 
 
-def business_slug(business: dict) -> str:
-    """
-    Business URLs use:
+def business_slug(
+    business: dict
+) -> str:
 
-    sais-0006-pawsome-training-and-behaviour
+    bid = slugify(
+        business_id(business)
+    )
 
-    The Business ID comes first so URLs remain tied to the
-    permanent SAIS Business ID.
-    """
-
-    bid = slugify(business_id(business))
-    name = slugify(business_name(business))
+    name = slugify(
+        business_name(business)
+    )
 
     if bid and name:
         return f"{bid}-{name}"
@@ -321,29 +618,37 @@ def business_slug(business: dict) -> str:
 
 
 # ============================================================
-# SEO HELPERS
+# SEO
 # ============================================================
 
 def create_page_title(
     business: dict
 ) -> str:
-    """
-    Create a unique title for each business page.
-    """
 
-    name = business_name(business)
-    cat = category(business)
-    loc = location(business)
+    name = business_name(
+        business
+    )
 
-    parts = []
+    cat = category(
+        business
+    )
 
-    if name:
-        parts.append(name)
+    loc = location(
+        business
+    )
 
-    if cat and cat.lower() not in name.lower():
+    parts = [name]
+
+    if (
+        cat
+        and cat.lower() not in name.lower()
+    ):
         parts.append(cat)
 
-    if loc and loc.lower() not in name.lower():
+    if (
+        loc
+        and loc.lower() not in name.lower()
+    ):
         parts.append(loc)
 
     parts.append("SAIS")
@@ -354,56 +659,97 @@ def create_page_title(
 def create_meta_description(
     business: dict
 ) -> str:
-    """
-    Create a useful search-result description from the actual
-    listing information.
 
-    We do not invent services or claims that aren't present
-    in the business record.
-    """
+    name = business_name(
+        business
+    )
 
-    name = business_name(business)
-    cat = category(business)
-    loc = location(business)
-    desc = description(business)
+    cat = category(
+        business
+    )
+
+    loc = location(
+        business
+    )
+
+    desc = description(
+        business
+    )
+
+    service_text = services(
+        business
+    )
+
+    pieces = []
 
     if desc:
-        text = (
-            f"{name} is listed in the Somerset Animal Business Directory. "
-            f"{desc}"
+        pieces.append(desc)
+
+    if service_text and service_text.lower() != desc.lower():
+        pieces.append(
+            service_text
         )
-    else:
+
+    if pieces:
+
         text = (
-            f"{name} is listed in the Somerset Animal Business Directory "
+            f"{name} in {loc}, Somerset. "
+            f"{' '.join(pieces)}"
+        )
+
+    else:
+
+        text = (
+            f"{name} is listed in the "
+            f"Somerset Animal Business Directory "
             f"as a {cat.lower()} in {loc}, Somerset."
         )
 
-    return truncate_text(text, 155)
+    return truncate_text(
+        text,
+        155
+    )
 
 
 def create_social_description(
     business: dict
 ) -> str:
-    """
-    Slightly longer description for social sharing.
-    """
 
-    name = business_name(business)
-    cat = category(business)
-    loc = location(business)
-    desc = description(business)
+    name = business_name(
+        business
+    )
+
+    cat = category(
+        business
+    )
+
+    loc = location(
+        business
+    )
+
+    desc = description(
+        business
+    )
 
     if desc:
-        text = (
-            f"{name} — {cat} in {loc}, Somerset. {desc}"
-        )
-    else:
+
         text = (
             f"{name} — {cat} in {loc}, Somerset. "
-            f"Listed in the Somerset Animal Business Directory."
+            f"{desc}"
         )
 
-    return truncate_text(text, 250)
+    else:
+
+        text = (
+            f"{name} — {cat} in {loc}, Somerset. "
+            f"Listed in the Somerset Animal "
+            f"Business Directory."
+        )
+
+    return truncate_text(
+        text,
+        250
+    )
 
 
 # ============================================================
@@ -414,29 +760,52 @@ def create_local_business_jsonld(
     business: dict,
     page_url: str
 ) -> str:
-    """
-    Generate LocalBusiness structured data using only information
-    actually available in the business listing.
-    """
 
-    name = business_name(business)
-    cat = category(business)
-    loc = location(business)
-    desc = description(business)
-    site = website(business)
-    tel = phone(business)
-    email = email_address(business)
-    addr = address(business)
+    name = business_name(
+        business
+    )
+
+    cat = category(
+        business
+    )
+
+    loc = location(
+        business
+    )
+
+    desc = description(
+        business
+    )
+
+    site = website(
+        business
+    )
+
+    tel = phone(
+        business
+    )
+
+    email = email_address(
+        business
+    )
+
+    addr = address(
+        business
+    )
+
+    postcode_value = postcode(
+        business
+    )
+
+    image = business_image(
+        business
+    )
 
     data = {
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
         "name": name,
         "url": page_url,
-        "areaServed": {
-            "@type": "AdministrativeArea",
-            "name": "Somerset",
-        },
     }
 
     if desc:
@@ -445,37 +814,90 @@ def create_local_business_jsonld(
     if cat:
         data["category"] = cat
 
-    if loc:
-        data["addressLocality"] = loc
-
     if tel:
         data["telephone"] = tel
 
     if email:
         data["email"] = email
 
-    if site:
-        data["sameAs"] = [site]
+    if image:
+        data["image"] = image
+
+    # --------------------------------------------------------
+    # ADDRESS
+    # --------------------------------------------------------
+
+    postal_address = {
+        "@type": "PostalAddress",
+        "addressRegion": "Somerset",
+        "addressCountry": "GB",
+    }
 
     if addr:
-        data["address"] = {
-            "@type": "PostalAddress",
-            "streetAddress": addr,
-            "addressRegion": "Somerset",
-            "addressCountry": "GB",
+        postal_address[
+            "streetAddress"
+        ] = addr
+
+    if loc:
+        postal_address[
+            "addressLocality"
+        ] = loc
+
+    if postcode_value:
+        postal_address[
+            "postalCode"
+        ] = postcode_value
+
+    data["address"] = postal_address
+
+    # --------------------------------------------------------
+    # AREA SERVED
+    # --------------------------------------------------------
+
+    if loc:
+
+        data["areaServed"] = {
+            "@type": "Place",
+            "name": loc,
         }
+
     else:
-        data["address"] = {
-            "@type": "PostalAddress",
-            "addressLocality": loc or "Somerset",
-            "addressRegion": "Somerset",
-            "addressCountry": "GB",
+
+        data["areaServed"] = {
+            "@type": "AdministrativeArea",
+            "name": "Somerset",
         }
+
+    # --------------------------------------------------------
+    # SOCIAL / IDENTITY LINKS
+    # --------------------------------------------------------
+
+    social_links = []
+
+    for social_url in [
+        facebook(business),
+        instagram(business),
+        twitter(business),
+        linkedin(business),
+        tiktok(business),
+        youtube(business),
+    ]:
+
+        if social_url:
+            social_links.append(
+                social_url
+            )
+
+    if social_links:
+        data["sameAs"] = social_links
 
     return json.dumps(
         data,
         ensure_ascii=False,
         indent=2
+    ).replace(
+        "</",
+        "<\\/"
     )
 
 
@@ -483,15 +905,6 @@ def create_breadcrumb_jsonld(
     business: dict,
     page_url: str
 ) -> str:
-    """
-    Breadcrumb structured data for:
-
-    Home
-      >
-    Somerset Animal Business Directory
-      >
-    Business
-    """
 
     data = {
         "@context": "https://schema.org",
@@ -512,7 +925,9 @@ def create_breadcrumb_jsonld(
             {
                 "@type": "ListItem",
                 "position": 3,
-                "name": business_name(business),
+                "name": business_name(
+                    business
+                ),
                 "item": page_url,
             },
         ],
@@ -522,6 +937,9 @@ def create_breadcrumb_jsonld(
         data,
         ensure_ascii=False,
         indent=2
+    ).replace(
+        "</",
+        "<\\/"
     )
 
 
@@ -530,25 +948,38 @@ def create_breadcrumb_jsonld(
 # ============================================================
 
 def fetch_businesses() -> list[dict]:
-    print("Fetching SAIS business data...")
-    print(API_URL)
+
+    print(
+        "Fetching SAIS business data..."
+    )
+
+    print(
+        API_URL
+    )
 
     request = Request(
         API_URL,
         headers={
-            "User-Agent": "SAIS-Business-Page-Generator/2.0",
-            "Accept": "application/json,text/plain,*/*",
+            "User-Agent":
+                "SAIS-Business-Page-Generator/3.0",
+            "Accept":
+                "application/json,text/plain,*/*",
         },
     )
 
     try:
+
         with urlopen(
             request,
             timeout=60
         ) as response:
-            raw = response.read().decode("utf-8-sig")
+
+            raw = response.read().decode(
+                "utf-8-sig"
+            )
 
     except HTTPError as exc:
+
         raise RuntimeError(
             "Could not retrieve the SAIS Apps Script data. "
             f"HTTP {exc.code}: {exc.reason}\n"
@@ -556,6 +987,7 @@ def fetch_businesses() -> list[dict]:
         ) from exc
 
     except URLError as exc:
+
         raise RuntimeError(
             "Could not retrieve the SAIS Apps Script data. "
             f"Network error: {exc.reason}\n"
@@ -563,15 +995,20 @@ def fetch_businesses() -> list[dict]:
         ) from exc
 
     except TimeoutError as exc:
+
         raise RuntimeError(
             "The SAIS Apps Script request timed out.\n"
             f"URL: {API_URL}"
         ) from exc
 
     try:
-        data = json.loads(raw)
+
+        data = json.loads(
+            raw
+        )
 
     except json.JSONDecodeError as exc:
+
         preview = raw[:500].replace(
             "\n",
             " "
@@ -582,10 +1019,18 @@ def fetch_businesses() -> list[dict]:
             f"Response started with: {preview!r}"
         ) from exc
 
-    if isinstance(data, list):
+    if isinstance(
+        data,
+        list
+    ):
+
         businesses = data
 
-    elif isinstance(data, dict):
+    elif isinstance(
+        data,
+        dict
+    ):
+
         businesses = (
             data.get("businesses")
             or data.get("data")
@@ -593,12 +1038,14 @@ def fetch_businesses() -> list[dict]:
         )
 
     else:
+
         businesses = []
 
     if not isinstance(
         businesses,
         list
     ):
+
         raise RuntimeError(
             "The Apps Script response contains an unexpected "
             "business data format."
@@ -607,7 +1054,10 @@ def fetch_businesses() -> list[dict]:
     clean = [
         business
         for business in businesses
-        if isinstance(business, dict)
+        if isinstance(
+            business,
+            dict
+        )
     ]
 
     print(
@@ -626,15 +1076,61 @@ def page_html(
     slug: str
 ) -> str:
 
-    name = business_name(business)
-    cat = category(business)
-    loc = location(business)
-    desc = description(business)
-    site = website(business)
-    tel = phone(business)
-    email = email_address(business)
-    addr = address(business)
-    bid = business_id(business)
+    name = business_name(
+        business
+    )
+
+    cat = category(
+        business
+    )
+
+    subcat = subcategory(
+        business
+    )
+
+    loc = location(
+        business
+    )
+
+    desc = description(
+        business
+    )
+
+    service_text = services(
+        business
+    )
+
+    site = website(
+        business
+    )
+
+    tel = phone(
+        business
+    )
+
+    tel_link = clean_phone_for_link(
+        tel
+    )
+
+    email = email_address(
+        business
+    )
+
+    addr = address(
+        business
+    )
+
+    postcode_value = postcode(
+        business
+    )
+
+    bid = business_id(
+        business
+    )
+
+    image = business_image(
+        business
+    )
 
     page_url = (
         f"{SITE_URL}/business/{slug}/"
@@ -652,15 +1148,61 @@ def page_html(
         business
     )
 
-    local_business_schema = create_local_business_jsonld(
-        business,
-        page_url
+    local_business_schema = (
+        create_local_business_jsonld(
+            business,
+            page_url
+        )
     )
 
-    breadcrumb_schema = create_breadcrumb_jsonld(
-        business,
-        page_url
+    breadcrumb_schema = (
+        create_breadcrumb_jsonld(
+            business,
+            page_url
+        )
     )
+
+    # --------------------------------------------------------
+    # SOCIAL IMAGE
+    # --------------------------------------------------------
+
+    social_image = (
+        image
+        if image
+        else f"{SITE_URL}/directorybanner.png"
+    )
+
+    # --------------------------------------------------------
+    # DESCRIPTION
+    # --------------------------------------------------------
+
+    if desc:
+
+        description_html = esc(
+            desc
+        )
+
+    else:
+
+        description_html = (
+            f"{esc(name)} is listed in the "
+            f"Somerset Animal Business Directory."
+        )
+
+    # --------------------------------------------------------
+    # SERVICES
+    # --------------------------------------------------------
+
+    services_html = ""
+
+    if service_text:
+
+        services_html = f"""
+        <section class="extra-section">
+          <h2>Services</h2>
+          <p>{esc(service_text)}</p>
+        </section>
+        """
 
     # --------------------------------------------------------
     # CONTACT BUTTONS
@@ -669,8 +1211,9 @@ def page_html(
     contact_buttons = []
 
     if site:
+
         contact_buttons.append(
-            f'''
+            f"""
             <a
               class="button"
               href="{esc(site)}"
@@ -679,31 +1222,33 @@ def page_html(
             >
               Visit Website
             </a>
-            '''
+            """
         )
 
-    if tel:
+    if tel and tel_link:
+
         contact_buttons.append(
-            f'''
+            f"""
             <a
               class="button secondary"
-              href="tel:{esc(tel)}"
+              href="tel:{esc(tel_link)}"
             >
               Call {esc(tel)}
             </a>
-            '''
+            """
         )
 
     if email:
+
         contact_buttons.append(
-            f'''
+            f"""
             <a
               class="button secondary"
               href="mailto:{esc(email)}"
             >
               Email
             </a>
-            '''
+            """
         )
 
     # --------------------------------------------------------
@@ -713,42 +1258,62 @@ def page_html(
     details = []
 
     if addr:
+
+        address_display = esc(
+            addr
+        )
+
+        if postcode_value:
+
+            address_display += (
+                f"<br>{esc(postcode_value)}"
+            )
+
         details.append(
-            f'''
+            f"""
             <div class="detail">
               <strong>Address</strong>
-              <span>{esc(addr)}</span>
+              <span>{address_display}</span>
             </div>
-            '''
+            """
         )
 
     if tel:
+
+        phone_target = (
+            esc(tel_link)
+            if tel_link
+            else esc(tel)
+        )
+
         details.append(
-            f'''
+            f"""
             <div class="detail">
               <strong>Telephone</strong>
-              <a href="tel:{esc(tel)}">
+              <a href="tel:{phone_target}">
                 {esc(tel)}
               </a>
             </div>
-            '''
+            """
         )
 
     if email:
+
         details.append(
-            f'''
+            f"""
             <div class="detail">
               <strong>Email</strong>
               <a href="mailto:{esc(email)}">
                 {esc(email)}
               </a>
             </div>
-            '''
+            """
         )
 
     if site:
+
         details.append(
-            f'''
+            f"""
             <div class="detail">
               <strong>Website</strong>
               <a
@@ -759,37 +1324,103 @@ def page_html(
                 {esc(site)}
               </a>
             </div>
-            '''
+            """
         )
 
     if bid:
+
         details.append(
-            f'''
+            f"""
             <div class="detail">
               <strong>SAIS Business ID</strong>
               <span>{esc(bid)}</span>
             </div>
-            '''
+            """
+        )
+
+    if subcat:
+
+        details.append(
+            f"""
+            <div class="detail">
+              <strong>Service Type</strong>
+              <span>{esc(subcat)}</span>
+            </div>
+            """
         )
 
     # --------------------------------------------------------
-    # DESCRIPTION
+    # SOCIAL LINKS
     # --------------------------------------------------------
 
-    if desc:
-        description_html = esc(desc)
-    else:
-        description_html = (
-            f"{esc(name)} is listed in the "
-            f"Somerset Animal Business Directory."
+    social_links = []
+
+    social_items = [
+        ("Facebook", facebook(business)),
+        ("Instagram", instagram(business)),
+        ("TikTok", tiktok(business)),
+        ("YouTube", youtube(business)),
+        ("LinkedIn", linkedin(business)),
+        ("X", twitter(business)),
+    ]
+
+    for label, url in social_items:
+
+        if not url:
+            continue
+
+        social_links.append(
+            f"""
+            <a
+              class="social-link"
+              href="{esc(url)}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {esc(label)}
+            </a>
+            """
         )
+
+    social_html = ""
+
+    if social_links:
+
+        social_html = f"""
+        <section class="social-section">
+          <h2>Find {esc(name)} online</h2>
+          <div class="social-links">
+            {''.join(social_links)}
+          </div>
+        </section>
+        """
+
+    # --------------------------------------------------------
+    # BUSINESS IMAGE
+    # --------------------------------------------------------
+
+    image_html = ""
+
+    if image:
+
+        image_html = f"""
+        <div class="business-image-wrap">
+          <img
+            class="business-image"
+            src="{esc(image)}"
+            alt="{esc(name)}"
+            loading="eager"
+          >
+        </div>
+        """
 
     # --------------------------------------------------------
     # GENERATED PAGE
     # --------------------------------------------------------
 
-    return f'''<!doctype html>
+    return f"""<!doctype html>
 <html lang="en-GB">
+
 <head>
 
   <meta charset="utf-8">
@@ -816,7 +1447,12 @@ def page_html(
     href="{esc(page_url)}"
   >
 
-  <!-- SAIS Branding -->
+  <meta
+    name="theme-color"
+    content="#c82333"
+  >
+
+  <!-- SAIS favicon -->
 
   <link
     rel="icon"
@@ -833,7 +1469,7 @@ def page_html(
 
   <meta
     property="og:type"
-    content="business.business"
+    content="website"
   >
 
   <meta
@@ -858,7 +1494,12 @@ def page_html(
 
   <meta
     property="og:image"
-    content="{SITE_URL}/directorybanner.png"
+    content="{esc(social_image)}"
+  >
+
+  <meta
+    property="og:image:alt"
+    content="{esc(name)}"
   >
 
   <meta
@@ -895,7 +1536,7 @@ def page_html(
 
   <meta
     name="twitter:image"
-    content="{SITE_URL}/directorybanner.png"
+    content="{esc(social_image)}"
   >
 
   <!-- LocalBusiness structured data -->
@@ -927,10 +1568,6 @@ def page_html(
 
     * {{
       box-sizing: border-box;
-    }}
-
-    html {{
-      scroll-behavior: smooth;
     }}
 
     body {{
@@ -1022,6 +1659,18 @@ def page_html(
         0 8px 30px rgba(15,23,42,.08);
     }}
 
+    .business-image-wrap {{
+      margin: -5px -5px 28px;
+    }}
+
+    .business-image {{
+      display: block;
+      width: 100%;
+      max-height: 360px;
+      object-fit: cover;
+      border-radius: 14px;
+    }}
+
     .eyebrow {{
       display: inline-block;
       color: var(--brand-red);
@@ -1046,16 +1695,28 @@ def page_html(
       margin-bottom: 25px;
     }}
 
-    .description-heading {{
+    h2 {{
       color: var(--navy);
       font-size: 1.05rem;
-      margin: 0 0 8px;
+      margin: 0 0 9px;
     }}
 
     .description {{
       font-size: 1.04rem;
       white-space: pre-line;
       color: var(--text);
+    }}
+
+    .extra-section,
+    .social-section {{
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 1px solid var(--border);
+    }}
+
+    .extra-section p {{
+      margin: 0;
+      white-space: pre-line;
     }}
 
     .details {{
@@ -1112,6 +1773,27 @@ def page_html(
 
     .button.secondary:hover {{
       background: var(--blue-dark);
+    }}
+
+    .social-links {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }}
+
+    .social-link {{
+      display: inline-block;
+      color: var(--blue);
+      border: 1px solid var(--border);
+      background: #ffffff;
+      padding: 8px 13px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+    }}
+
+    .social-link:hover {{
+      border-color: var(--blue);
     }}
 
     .back {{
@@ -1188,22 +1870,26 @@ def page_html(
       href="../../"
       aria-label="Back to Somerset Animal Business Directory"
     >
+
       <img
         class="logo"
         src="../../directorylogo.png"
         alt="Somerset Animal Information Services logo"
       >
+
     </a>
 
     <a
       class="brand"
       href="../../"
     >
+
       {esc(DIRECTORY_NAME)}
 
       <span class="brand-small">
         {esc(SITE_NAME)}
       </span>
+
     </a>
 
   </div>
@@ -1216,6 +1902,7 @@ def page_html(
     class="breadcrumbs"
     aria-label="Breadcrumb"
   >
+
     <a href="../../">
       Somerset Animal Business Directory
     </a>
@@ -1227,9 +1914,12 @@ def page_html(
     <span>
       {esc(name)}
     </span>
+
   </nav>
 
   <article class="card">
+
+    {image_html}
 
     <div class="eyebrow">
       {esc(cat)}
@@ -1245,10 +1935,7 @@ def page_html(
 
     <section aria-labelledby="about-business">
 
-      <h2
-        id="about-business"
-        class="description-heading"
-      >
+      <h2 id="about-business">
         About {esc(name)}
       </h2>
 
@@ -1258,11 +1945,15 @@ def page_html(
 
     </section>
 
+    {services_html}
+
     <div class="details">
 
       {''.join(details)}
 
     </div>
+
+    {social_html}
 
     <div class="buttons">
 
@@ -1302,8 +1993,9 @@ def page_html(
 </footer>
 
 </body>
+
 </html>
-'''
+"""
 
 
 # ============================================================
@@ -1311,32 +2003,41 @@ def page_html(
 # ============================================================
 
 def create_sitemap(
-    urls: list[str]
+    urls: list[tuple[str, str | None]]
 ) -> str:
-
-    generated_time = datetime.now(
-        timezone.utc
-    ).date().isoformat()
 
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ]
 
-    for url in urls:
+    for url, lastmod in urls:
 
         lines.append(
             "  <url>"
-            f"<loc>{esc(url)}</loc>"
-            f"<lastmod>{generated_time}</lastmod>"
-            "</url>"
+        )
+
+        lines.append(
+            f"    <loc>{esc(url)}</loc>"
+        )
+
+        if lastmod:
+
+            lines.append(
+                f"    <lastmod>{esc(lastmod)}</lastmod>"
+            )
+
+        lines.append(
+            "  </url>"
         )
 
     lines.append(
         "</urlset>"
     )
 
-    return "\n".join(lines) + "\n"
+    return "\n".join(
+        lines
+    ) + "\n"
 
 
 # ============================================================
@@ -1348,6 +2049,7 @@ def generate() -> None:
     businesses = fetch_businesses()
 
     if not businesses:
+
         raise RuntimeError(
             "No businesses were returned. Nothing was generated."
         )
@@ -1372,8 +2074,13 @@ def generate() -> None:
 
         used_slugs: set[str] = set()
 
-        sitemap_urls = [
-            f"{SITE_URL}/"
+        sitemap_urls: list[
+            tuple[str, str | None]
+        ] = [
+            (
+                f"{SITE_URL}/",
+                None
+            )
         ]
 
         generated_count = 0
@@ -1418,7 +2125,8 @@ def generate() -> None:
             )
 
             out_dir = (
-                temp_business_dir / slug
+                temp_business_dir /
+                slug
             )
 
             out_dir.mkdir(
@@ -1427,7 +2135,8 @@ def generate() -> None:
             )
 
             output_file = (
-                out_dir / "index.html"
+                out_dir /
+                "index.html"
             )
 
             output_file.write_text(
@@ -1438,8 +2147,38 @@ def generate() -> None:
                 encoding="utf-8"
             )
 
-            sitemap_urls.append(
+            page_url = (
                 f"{SITE_URL}/business/{slug}/"
+            )
+
+            # Only use a Last Updated date in the sitemap
+            # if the spreadsheet actually provides one.
+            lastmod = updated_date(
+                business
+            )
+
+            if lastmod:
+
+                # Keep only a normal ISO-style date where possible.
+                match = re.search(
+                    r"\d{4}-\d{2}-\d{2}",
+                    lastmod
+                )
+
+                if match:
+                    lastmod = match.group(0)
+                else:
+                    lastmod = None
+
+            else:
+
+                lastmod = None
+
+            sitemap_urls.append(
+                (
+                    page_url,
+                    lastmod
+                )
             )
 
             generated_count += 1
@@ -1457,10 +2196,11 @@ def generate() -> None:
             )
 
         # ----------------------------------------------------
-        # Replace existing generated business directory
+        # Replace generated business pages
         # ----------------------------------------------------
 
         if BUSINESS_DIR.exists():
+
             shutil.rmtree(
                 BUSINESS_DIR
             )
@@ -1484,27 +2224,39 @@ def generate() -> None:
         )
 
         print()
+
         print(
             "=========================================="
         )
+
         print(
             "SAIS BUSINESS PAGE GENERATION COMPLETE"
         )
+
         print(
             "=========================================="
         )
+
         print(
-            f"Business pages generated: {generated_count}"
+            f"Business pages generated: "
+            f"{generated_count}"
         )
+
         print(
-            f"Businesses skipped: {skipped_count}"
+            f"Businesses skipped: "
+            f"{skipped_count}"
         )
+
         print(
-            f"Sitemap URLs: {len(sitemap_urls)}"
+            f"Sitemap URLs: "
+            f"{len(sitemap_urls)}"
         )
+
         print(
-            f"Sitemap: {SITEMAP_FILE}"
+            f"Sitemap: "
+            f"{SITEMAP_FILE}"
         )
+
         print(
             "=========================================="
         )
@@ -1522,4 +2274,5 @@ def generate() -> None:
 # ============================================================
 
 if __name__ == "__main__":
+
     generate()
